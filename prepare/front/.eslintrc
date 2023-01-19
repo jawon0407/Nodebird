@@ -1,0 +1,26 @@
+{
+    "parserOptions" : {
+        "ecmaVersion" :  2022 ,
+        "sourceType" :  "module", // import export 방식 사용
+        "ecmaFeatures" : {
+            "jsx" :  true  // jsx 사용
+        }
+    },
+    "env" : {
+        "browser" :  true , // 브라우저 환경
+        "node" :  true , // node 환경
+        "es6" :  true,  // es6 환경
+        "es11" :  true  // es11 환경
+    },
+    "extends" : [
+        "eslint:recommended", // eslint 권장 설정
+        "plugin:react/recommended" // react 권장 설정
+    ],
+    "plugins" : [
+        "import", 
+        "react-hooks"
+    ],
+    "rules" : {
+        
+    }
+}
