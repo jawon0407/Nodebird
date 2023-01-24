@@ -8,10 +8,25 @@ import useInput from './hooks/useInput';
 import UserProfile from './UserProfile';
 import LoginForm from "./LoginForm";
 
-import styled from "styled-components";
+import styled , {createGlobalStyle} from "styled-components";
 
 const SearchInput = styled(Input.Search)`
     vertical-align : middle;
+`
+
+const Global = createGlobalStyle`
+    .ant-row{
+        margin-right : 0 !important;
+        margin-left : 0 !important;
+    }
+
+    .ant-col:first-child{
+        padding-left : 0 !important;
+    }
+
+    .ant-col:last-child{
+        padding-right : 0 !important;
+    }
 `
 
 //const style = useMemo(() => ({ marginTop : 10 }), []);
@@ -23,6 +38,7 @@ export const AppLayout = ({ children }) => {
     return (
         <>
             <div>
+                <Global />
                 <div>
                     <Menu
                         mode="horizontal"

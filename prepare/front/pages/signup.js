@@ -4,9 +4,14 @@ import { Form , Input , Checkbox , Button } from 'antd';
 import Head from 'next/head';
 import AppLayout from '../components/AppLayout';
 import useInput from '../components/hooks/useInput';
+import { useSelector, useDispatch } from 'react-redux';
+import { signUp } from '../reducers/user';
 
 const SignUp = () => {
-    const [id, onChangeId] = useInput('');
+    const dispatch = useDispatch();
+    const { signUpLoading } = useSelector((state) => state.user);
+
+    const [email, onChangeEmail] = useInput('');
     const [nickname, onChangeNickname] = useInput('');
     
     const [password, onChangePassword] = useInput('');
@@ -31,8 +36,11 @@ const SignUp = () => {
         if(!term){
             return setTermError(true);
         }
-        console.log(id, nickname, password);
-    },[password, passwordCheck, term])
+        console.log(email, nickname, password);
+        dispatch(signUp({
+            email, nickname, password
+        }))
+    },[email, password, passwordCheck, term])
 
     return(
         <>
@@ -42,9 +50,9 @@ const SignUp = () => {
                 </Head>  
                 <Form onFinish={onSubmit}>
                     <div>
-                        <label htmlFor="user-id">아이디</label>
+                        <label htmlFor="user-email">이메일</label>
                         <br />
-                        <Input name="user-id" value={id} onChange={onChangeId} required />
+                        <Input name="user-email" type="email" value={email} onChange={onChangeEmail} required />
                     </div>
                     <div>
                         <label htmlFor="user-nickname">닉네임</label>
@@ -69,7 +77,7 @@ const SignUp = () => {
                         </Checkbox>
                     </div>
                     <div className="mt-8 text-right space-x-2">
-                        <Button type="primary" htmlType="submit">가입하기</Button>
+                        <Button type="primary" htmlType="submit" loading="signUpLoading">가입하기</Button>
                     </div>
                 </Form>
             </AppLayout>

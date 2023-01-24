@@ -1,15 +1,20 @@
 import React , {useState , useCallback} from 'react';
 import PropTypes from 'prop-types';
+
 import PostImages from './PostImages';
 import CommentForm from './CommentForm';
+import FollowButton from './FollowButton';
+import PostCardContent from './PostCardContent';
+import { removePost } from '../actions/post';
 
-import { useSelector } from 'react-redux';
+import { useSelector , useDispatch } from 'react-redux';
 import { Card , Popover , Button , Avatar , List , Comment } from 'antd';
 import { EllipsisOutlined, MessageOutlined, RetweetOutlined , HeartOutlined , HeartTwoTone } from '@ant-design/icons';
 
 const userSelector = (state) => state.user;
 
 const PostCard = ({ post }) => {
+    const dispatch = useDispatch();
     const [liked , setLiked] = useState(false);
     const [commentFormOpened , setCommentFormOpened] = useState(false);
     const onToggleLike = useCallback(() => {
@@ -21,7 +26,12 @@ const PostCard = ({ post }) => {
     },[]);
 
     const { me } = useSelector(userSelector);
-    const id = me?.id;
+    const email = me?.email;
+
+    const onRemovePost = useCallback(() => {
+        console.log(`삭제 : ${post.id}`);
+        dispatch(removePost(post.id));
+    },[]);
 
     return(
         <>
@@ -36,10 +46,10 @@ const PostCard = ({ post }) => {
                         <MessageOutlined key="comment" onClick={onToggleComment}/>,
                         <Popover key="more" content={(
                             <Button.Group>
-                                { id && post.User.id === id ? (
+                                { email && post.User.nickname === email.split("@")[0] ? (
                                     <>
                                         <Button>수정</Button>
-                                        <Button type="danger">삭제</Button>
+                                        <Button type="danger" onClick={onRemovePost}>삭제</Button>
                                     </>
                                 ) : null }
                                 <Button>신고</Button>
@@ -48,11 +58,12 @@ const PostCard = ({ post }) => {
                             <EllipsisOutlined />
                         </Popover>
                     ]}
+                    extra={ email && <FollowButton post={post}/>}
                     >
                     <Card.Meta 
                         avatar = {<Avatar>{post.User.nickname[0]}</Avatar>}
                         title = {post.User.nickname}
-                        description = {post.content}
+                        description = {<PostCardContent postData={post.content} />}
                     />
                 </Card>
                 {commentFormOpened && (
@@ -68,7 +79,7 @@ const PostCard = ({ post }) => {
                                     <Comment
                                         author = {item.User.nickname}
                                         avatar = {<Avatar>{item.User.nickname[0]}</Avatar>}
-                                        content = {item.content}
+                                        content = {item.comment}
                                     />
                                 </li>
                             )}

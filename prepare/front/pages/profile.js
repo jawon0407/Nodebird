@@ -1,32 +1,27 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 //nextJS 에서는 안써도 되는데, 일단 써놓자.
 import Head from 'next/head';
-
+import Router from 'next/router';
 import AppLayout from '../components/AppLayout';
 import NicknameEditForm from '../components/NicknameEditForm';
 import FollowList from '../components/FollowList';
+import { useSelector } from 'react-redux';
+
+const userSelector = (state) => state.user;
 
 const Profile = () => {
-    const followingList = [{
-        nickname: "Jawon0407",
-        profile_text: "Hello my name is Jaewon Cho studying react nodebird" 
-    },{
-        nickname: "Blessed_Leo",
-        profile_text: "my name is Blessed_Leo" 
-    },{
-        nickname: "ZeroCho",
-        profile_text : "my react teacher"
-    }]
-    const followerList = [{
-        nickname: "Jawon0407",
-        profile_text: "Hello my name is Jaewon Cho studying react nodebird" 
-    },{
-        nickname: "Blessed_Leo",
-        profile_text: "my name is Blessed_Leo" 
-    },{
-        nickname: "ZeroCho",
-        profile_text : "my react teacher"
-    }] 
+    const { me } = useSelector(userSelector);
+    
+    useEffect(()=>{
+        if(!(me && me.id)){
+            alert('로그인이 필요합니다.');
+            Router.push('/');
+        }
+    },[me && me.id]);
+
+    if(!me){
+        return null;
+    }
 
     return(
         <>
@@ -35,8 +30,8 @@ const Profile = () => {
                     <title>내 프로필 | NodeBird</title>
                 </Head>  
                 <NicknameEditForm />
-                <FollowList header="팔로잉 목록" data={followingList}/>
-                <FollowList header="팔로워 목록" data={followerList}/>
+                <FollowList header="팔로잉 목록" data={me?.Followings}/>
+                <FollowList header="팔로워 목록" data={me?.Followers}/>
             </AppLayout>
         </>
     )

@@ -1,21 +1,41 @@
-import React , { useRef , useState , useCallback } from 'react';
+import React , { useRef , useState , useCallback , useEffect } from 'react';
 import { Form , Input , Button } from 'antd';
+
 import { useSelector , useDispatch } from 'react-redux';
 import { addPost } from '../actions/post';
+import useInput from './hooks/useInput';
+import userSlice from '../reducers/userSlice';
+
+import shortid from 'shortid';  
 
 const postSelector = (state) => state.post
 
 const PostForm = () => {
     const dispatch = useDispatch();
-    const { imagePaths } = useSelector(postSelector);
-    const [text, setText] = useState('');
-    const onChangeText = useCallback((e) => {
-        setText(e.target.value);
-    },[])
+    const { me } = useSelector((state) => state.user);
+    const email = me?.email;
+    const { imagePaths , addPostDone } = useSelector(postSelector);
+    const [text, onChangeText , setText] = useInput('');
     const onSubmit = useCallback(() => {
-        dispatch(addPost());
-        setText('');
-    },[])
+        dispatch(addPost({
+            id: shortid.generate(),
+            content: text,
+            User: {
+                id: 1,
+                nickname: email.split("@")[0]
+            },
+            Images : [],
+            Comments : [],
+            Like : [],
+            Retweet : [],
+        }))
+    },[text , imagePaths, email])
+
+    useEffect(() => {
+        if(addPostDone){
+            setText('');
+        }
+    }, [addPostDone])
 
     const imageInput = useRef();
     const onClickImageUpload = useCallback(() => {

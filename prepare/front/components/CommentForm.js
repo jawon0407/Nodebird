@@ -1,21 +1,44 @@
-import React , {useCallback} from "react";
+import React , { useCallback , useEffect } from "react";
 import PropTypes from "prop-types";
 import { Form, Input, Button } from "antd";
 import useInput from "./hooks/useInput";
-import { useSelector } from "react-redux";
+import { useSelector , useDispatch } from "react-redux";
+import { addComment } from "../actions/post";
+import shortid from "shortid";
 
 const CommentForm = ({ post }) => {
+    const dispatch = useDispatch();
     const id = useSelector((state) => state.user.me?.id);
-    const [ commentText , onChangeCommentText ] = useInput("");
+    const { addCommentLoading , addCommentDone } = useSelector((state) => state.post);
+    const [ commentText , onChangeCommentText , setCommentText ] = useInput('');
+    
     const onSubmitComment = useCallback(() => {
-        console.log(post.id , commentText);
+        dispatch(addComment({
+            postId : post.id,
+            id : shortid.generate(),
+            comment : commentText,
+            User : {
+                id,
+                nickname : "조재원",
+            },
+            Images : [],
+            Comments : [],
+        }));
     },[commentText])
+
+    useEffect(() => {
+        if(addCommentDone){
+            setCommentText('');
+        }
+        // = componentDidMount, [값] = componentDidUpdate;
+    },[addCommentDone]);
+    
     return(
         <>
             <Form onFinish={onSubmitComment}>
                 <Form.Item className="relative m-0">
                     <Input.TextArea value={commentText} onChange={onChangeCommentText} rows={4} />
-                    <Button type="primary" htmlType="submit" loading={false}>댓글 달기</Button>
+                    <Button type="primary" htmlType="submit" loading={addCommentLoading}>댓글 달기</Button>
                 </Form.Item>
             </Form>
         </>

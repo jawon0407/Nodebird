@@ -1,6 +1,7 @@
 {
+    "parser" : "babel-eslint" , // babel-eslint 사용
     "parserOptions" : {
-        "ecmaVersion" :  2022 ,
+        "ecmaVersion" :  "latest" ,
         "sourceType" :  "module", // import export 방식 사용
         "ecmaFeatures" : {
             "jsx" :  true  // jsx 사용
@@ -13,14 +14,20 @@
         "es11" :  true  // es11 환경
     },
     "extends" : [
-        "eslint:recommended", // eslint 권장 설정
-        "plugin:react/recommended" // react 권장 설정
+        "airbnb"  // airbnb 기본 설정
     ],
     "plugins" : [
         "import", 
         "react-hooks"
     ],
     "rules" : {
-        
+        "jsx-a11y/label-has-associated-control" :  "off" , // label 에 htmlFor 사용
+        "jsx=a11y/anchor-is-valid" :  "off" , // a 태그에 href 사용
+        "no-console" :  "off" , // console 사용
+        "no-underscore-dangle" :  "off" , // _ 사용
+        "react/forbid-prop-types" :  "off" , // prop-types 사용
+        "react/jsx-filename-extension" :  "off" , // jsx 파일 확장자
+        "object-curly-newline" :  "off" , // 객체 구조 분해 할당
+        "linebreak-style" :  "off" // 라인 끝
     }
 }
