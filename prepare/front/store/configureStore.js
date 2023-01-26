@@ -7,7 +7,7 @@ import rootReducer from '../reducers';
 const isDev = process.env.NODE_ENV === 'development';
 const createStore = () => {
     const middleware = getDefaultMiddleware();
-    if(isDev){
+    if(isDev){ 
         middleware.push(logger);
     }
     const store = configureStore({

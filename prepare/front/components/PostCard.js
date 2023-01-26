@@ -93,14 +93,14 @@ const PostCard = ({ post }) => {
 
 PostCard.propTypes = {
     post: PropTypes.shape({
-      id: PropTypes.number,
+      id: PropTypes.any,
       User: PropTypes.object,
       content: PropTypes.string,
       createdAt: PropTypes.string,
       Comments: PropTypes.arrayOf(PropTypes.object),
       Images: PropTypes.arrayOf(PropTypes.object),
       Likers: PropTypes.arrayOf(PropTypes.object),
-      RetweetId: PropTypes.number,
+      RetweetId: PropTypes.any,
       Retweet: PropTypes.objectOf(PropTypes.any),
     }).isRequired,
   };

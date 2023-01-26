@@ -1,15 +1,16 @@
-import React , { useCallback , useState } from 'react';
+import React , { useCallback , useState , useEffect } from 'react';
 //nextJS 에서는 안써도 되는데, 일단 써놓자.
 import { Form , Input , Checkbox , Button } from 'antd';
 import Head from 'next/head';
+import Router from 'next/router';
 import AppLayout from '../components/AppLayout';
 import useInput from '../components/hooks/useInput';
 import { useSelector, useDispatch } from 'react-redux';
-import { signUp } from '../reducers/user';
+import { signUp } from '../actions/user';
 
 const SignUp = () => {
     const dispatch = useDispatch();
-    const { signUpLoading } = useSelector((state) => state.user);
+    const { signUpAction , signUpLoading , signUpDone , signUpError } = useSelector((state) => state.user);
 
     const [email, onChangeEmail] = useInput('');
     const [nickname, onChangeNickname] = useInput('');
@@ -42,6 +43,21 @@ const SignUp = () => {
         }))
     },[email, password, passwordCheck, term])
 
+    useEffect(() => {
+        if(signUpAction){
+            if(signUpDone){
+                Router.push('/');
+            }
+        }
+    },[signUpAction, signUpDone]);
+
+    useEffect(() => {
+        if(signUpError){
+            console.log(signUpError);
+            alert(signUpError);
+        }
+    },[signUpError]);
+
     return(
         <>
             <AppLayout>
@@ -62,12 +78,12 @@ const SignUp = () => {
                     <div>
                         <label htmlFor="user-password">패스워드</label>
                         <br />
-                        <Input name="user-password" value={password} onChange={onChangePassword} required />
+                        <Input name="user-password" type="password" value={password} onChange={onChangePassword} required />
                     </div>
                     <div>
                         <label htmlFor="user-password-check">비밀번호확인</label>
                         <br />
-                        <Input name="user-password-check" value={passwordCheck} onChange={onChangePasswordCheck} required />
+                        <Input name="user-password-check" type="password" value={passwordCheck} onChange={onChangePasswordCheck} required />
                         {passwordError && <div className="text-red-500">비밀번호가 일치하지 않습니다.</div>}
                     </div>
                     <div>
@@ -77,7 +93,8 @@ const SignUp = () => {
                         </Checkbox>
                     </div>
                     <div className="mt-8 text-right space-x-2">
-                        <Button type="primary" htmlType="submit" loading="signUpLoading">가입하기</Button>
+                        {console.log(signUpLoading)}
+                        <Button type="primary" htmlType="submit" loading={signUpLoading}>가입하기</Button>
                     </div>
                 </Form>
             </AppLayout>

@@ -1,4 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import axios from 'axios';
 
 const delay = (data , time) => new Promise((resolve, reject) => {
     setTimeout(() =>{
@@ -24,12 +25,12 @@ export const logOut = createAsyncThunk('user/logout' , async (data, thunkAPI) =>
     }
 });
 
-export const signUp = createAsyncThunk('user/signup' , async (data, thunkAPI) => {
+export const signUp = createAsyncThunk('user/signup' , async (data, { rejectWithValue }) => {
     try{
-        const result = await delay(data, 1000);
-        return result
+        const result = await axios.post('http://localhost:4070/user' , data);
+        return result;
     }catch(error){
-        console.log(error);
+        return rejectWithValue(error.response.data);
     }
 });
 

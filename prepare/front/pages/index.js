@@ -20,9 +20,7 @@ const Home = () => {
             console.log(window.scrollY, document.documentElement.clientHeight, document.documentElement.scrollHeight);
             if(window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 300){
                 if(hasMorePosts && !loadPostsLoading){
-                    dispatch(loadPost(10));
-                    console.log(loadPostsLoading);
-                }
+                    dispatch(loadPost(10));                }
             }
         }
         window.addEventListener('scroll', onScroll);

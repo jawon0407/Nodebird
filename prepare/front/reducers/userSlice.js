@@ -4,27 +4,35 @@ import { logIn , logOut , signUp , followUser , unFollowUser } from '../actions/
 export const initialState = {
     me: null, // 내 정보
     userInfo: null, // 유저 정보
+    loadMyInfoAction : false, // 로그인 정보 조회 액션
     loadMyInfoLoading: false, // 로그인 정보 조회
     loadMyInfoDone: false,
     loadMyInfoError: null,
+    loadMyInfoLoading : false, // 유저 정보 조회 액션
     loadUserLoading: false, // 유저 정보 조회
     loadUserDone: false,
     loadUserError: null,
+    logInAction : false, // 로그인 액션
     logInLoading: false, // 로그인 시도중
     logInDone: false,
     logInError: null,
+    logOutAction : false, // 로그아웃 액션
     logOutLoading: false, // 로그아웃 시도중
     logOutDone: false,
     logOutError: null,
+    signUpAction : false, // 회원가입 액션
     signUpLoading: false, // 회원가입 시도중
     signUpDone: false,
     signUpError: null,
+    changeNicknameAction : false, // 닉네임 변경 액션
     changeNicknameLoading: false, // 닉네임 변경 시도중
     changeNicknameDone: false,
     changeNicknameError: null,
+    followAction : false, // 팔로우 액션
     followLoading: false, // 팔로우
     followDone: false,
     followError: null,
+    unFollowAction : false, // 언팔로우 액션
     unFollowLoading: false, // 언팔로우
     unFollowDone: false,
     unFollowError: null,
@@ -72,6 +80,7 @@ const userSlice = createSlice({
             state.logOutError = action.error;
         })
         .addCase(signUp.pending, (state, action) => {
+            state.signUpAction = true;
             state.signUpLoading = true;
             state.signUpDone = false;
             state.signUpError = null;
@@ -79,11 +88,11 @@ const userSlice = createSlice({
         .addCase(signUp.fulfilled, (state, action) => {
             state.signUpLoading = false;
             state.signUpDone = true;
-            
+            state.signUpAction = false;
         })
         .addCase(signUp.rejected, (state, action) => {
             state.signUpLoading = false;
-            state.signUpError = action.error;
+            state.signUpError = action.payload;
         })
         .addCase(followUser.pending , (state, action) => {
             state.followLoading = true;
