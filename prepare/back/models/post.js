@@ -16,9 +16,9 @@ module.exports = (sequelize, DataTypes) => {
     });
     Post.associate = (db) => {
         db.Post.belongsTo(db.User); // Post : User = N : 1 다 대 1 관계
-        db.Post.belongsTo(db.Post, { through: 'Retweet', as: 'Retweeted', foreignKey: 'RetweetId' })
+        db.Post.belongsTo(db.Post, { as: 'Retweet' });
         db.Post.belongsToMany(db.Hashtag, { through: 'PostHashtag' }); // Post : Hashtag = N : M 다 대 다 관계
-        db.Post.belongsToMany(db.User , { through : "Like" , as : "Likers"})
+        db.Post.belongsToMany(db.User, { through: 'Like', as: 'Likers' }); // post.addLikers , post.removeLikers
         db.Post.hasMany(db.Comment);   // Post : Comment = 1 : N 1 대 다수 관계
         db.Post.hasMany(db.Image); // Post : Image = 1 : N 1 대 다수 관계
     };

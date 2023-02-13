@@ -1,54 +1,71 @@
 const express = require('express');
 const cors = require('cors');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const passport = require('passport');
+const dotenv = require('dotenv');
+const morgan = require('morgan');
+const path = require('path');
+const hpp = require('hpp'); 
+const helmet = require('helmet');
 
 const postRouter = require('./routes/post');
+const postsRouter = require('./routes/posts');
 const userRouter = require('./routes/user');
+const hashtagRouter = require('./routes/hashtag');
 const db = require('./models');
+const passportConfig = require('./passport');
 
+dotenv.config();
 const app = express();
 db.sequelize.sync()
-    .then(() => {
-        console.log('DB 연결 성공');
-    })
-    .catch(console.error);
+  .then(() => {
+    console.log('db 연결 성공');
+  })
+  .catch(console.error);
+passportConfig();
 
-/**
- * app.get : 가져오다
- * app.post : 생성하다
- * app.delete : 삭제하다
- * app.put : 전체 수정
- * app.patch : 부분 수정
- * app.options : 찔러보다
- * app.head : 헤더만 가져오다(요청 헤더 정보만 가져옴)
-*/
-
-app.use(cors({
-    origin: '*',
-    credentials: false, // 쿠키를 전달할지 말지
+if (process.env.NODE_ENV === 'production') {
+  app.use(morgan('combined'));
+  app.use(hpp());
+  app.use(helmet({ contentSecurityPolicy: false }));
+  app.use(cors({
+    origin: 'http://nodebird.com',
+    credentials: true,
+  }));
+} else {
+  app.use(morgan('dev'));
+  app.use(cors({
+    origin: true,
+    credentials: true,
+  }));
+}
+app.use('/', express.static(path.join(__dirname, 'uploads')));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(session({
+  saveUninitialized: false,
+  resave: false,
+  secret: process.env.COOKIE_SECRET,
+  cookie: {
+    httpOnly: true,
+    secure: false,
+    domain: process.env.NODE_ENV === 'production' && '.nodebird.com'
+  },
 }));
-app.use(express.json()); // json 형식의 데이터를 받아올 수 있게 해줌
-app.use(express.urlencoded({ extended: true })); // front에서의 form 형식의 데이터를 받아올 수 있게 해줌
-// 이 두개를 사용하면 req.body에 데이터가 들어옴 라우팅 하기 전에 제일 위에 있어야 한다
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.get('/', (req, res) => {
-    res.send('Hello Express')
-})
+  res.send('hello express');
+});
 
-app.get('/api', (req, res) => {
-    res.send('Hello Express API')
-})
+app.use('/posts', postsRouter);
+app.use('/post', postRouter);
+app.use('/user', userRouter);
+app.use('/hashtag', hashtagRouter);
 
-app.get('/post' , (req, res) => {
-    res.json([
-        {id: 1, content: 'Post 1'},
-        {id: 2, content: 'Post 2'},
-        {id: 3, content: 'Post 3'},
-    ])
-})
-
-app.use('/post',postRouter)
-app.use('/user',userRouter)
-
-app.listen(4070 , () => {
-    console.log('서버 실행 중!!')
+app.listen(4070, () => {
+  console.log('서버 실행 중!');
 });

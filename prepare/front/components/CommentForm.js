@@ -4,7 +4,6 @@ import { Form, Input, Button } from "antd";
 import useInput from "./hooks/useInput";
 import { useSelector , useDispatch } from "react-redux";
 import { addComment } from "../actions/post";
-import shortid from "shortid";
 
 const CommentForm = ({ post }) => {
     const dispatch = useDispatch();
@@ -13,17 +12,7 @@ const CommentForm = ({ post }) => {
     const [ commentText , onChangeCommentText , setCommentText ] = useInput('');
     
     const onSubmitComment = useCallback(() => {
-        dispatch(addComment({
-            postId : post.id,
-            id : shortid.generate(),
-            comment : commentText,
-            User : {
-                id,
-                nickname : "조재원",
-            },
-            Images : [],
-            Comments : [],
-        }));
+        dispatch(addComment({content : commentText, postId : post.id, userId : id}));
     },[commentText])
 
     useEffect(() => {

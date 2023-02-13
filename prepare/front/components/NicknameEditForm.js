@@ -1,19 +1,28 @@
-import React from 'react';
+import React , { useCallback } from 'react';
 import { Form, Input } from 'antd';
-import styled from 'styled-components';
+import { changeNickname } from '../actions/user'; 
+import { useSelector , useDispatch } from 'react-redux';
+import useInput from './hooks/useInput';
 
 const NicknameEditForm = () => {
-    const FormWrapper = styled(Form)`
-        margin-bottom: 20px;
-        border: 1px solid #d9d9d9;
-        padding: 20px;
-    `
-
+    const { me } = useSelector((state) => state.user);
+    const dispatch = useDispatch();
+    const [nickname , onChangeNickname] = useInput(me?.nickname || '');
+    const onSubmit = useCallback(() => {
+        dispatch(changeNickname({nickname : nickname}));
+    },[nickname]);
+    
     return(
         <>
-            <FormWrapper>
-                <Input Search addonBefore="닉네임" enterButton="수정" />
-            </FormWrapper>
+            <Form className="!mb-5 border !p-5" onFinish={onSubmit}>
+                <Input.Search
+                    value={nickname}
+                    onChange={onChangeNickname} 
+                    addonBefore="닉네임"
+                    enterButton="수정" 
+                    onSearch={onSubmit}
+                />
+            </Form>
         </>
     )
 }

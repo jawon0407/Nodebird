@@ -1,35 +1,30 @@
 import React , { useRef , useState , useCallback , useEffect } from 'react';
 import { Form , Input , Button } from 'antd';
 
+import postSlice from '../reducers/postSlice';
 import { useSelector , useDispatch } from 'react-redux';
-import { addPost } from '../actions/post';
-import useInput from './hooks/useInput';
-import userSlice from '../reducers/userSlice';
-
-import shortid from 'shortid';  
+import { addPost , uploadImages } from '../actions/post';
+import useInput from './hooks/useInput'; 
 
 const postSelector = (state) => state.post
 
 const PostForm = () => {
     const dispatch = useDispatch();
-    const { me } = useSelector((state) => state.user);
-    const email = me?.email;
     const { imagePaths , addPostDone } = useSelector(postSelector);
     const [text, onChangeText , setText] = useInput('');
     const onSubmit = useCallback(() => {
-        dispatch(addPost({
-            id: shortid.generate(),
-            content: text,
-            User: {
-                id: 1,
-                nickname: email.split("@")[0]
-            },
-            Images : [],
-            Comments : [],
-            Like : [],
-            Retweet : [],
-        }))
-    },[text , imagePaths, email])
+        if(!text || !text.trim()){
+            return alert('게시글을 작성하세요.');
+        }
+        const formData = new FormData();
+        imagePaths.forEach((p) => {
+            formData.append('image', p);
+        });
+        formData.append('content', text);
+        console.log(formData);
+        dispatch(addPost(formData));
+    },[text , imagePaths]);
+
 
     useEffect(() => {
         if(addPostDone){
@@ -42,6 +37,23 @@ const PostForm = () => {
         imageInput.current.click();
     },[imageInput.current])
 
+    const onChangeImages = useCallback((e) => {
+        console.log(e.target.files);
+        const imageFormData = new FormData();
+        [].forEach.call(e.target.files, (f) => {
+            imageFormData.append('image', f);
+            //append(키, 값) -> upload.array()의 인자와 같아야 인식함. 
+        });
+        dispatch(uploadImages(imageFormData));    
+    },[])
+
+    const onRemoveImage = useCallback((index) => () => {
+        dispatch(
+            postSlice.actions.removeImage(index)
+        );
+    },[])
+
+
     return(
         <>
             <Form style={{margin : '10px 0 20px'}} encType="multipart/form-data" onFinish={onSubmit}>
@@ -52,21 +64,19 @@ const PostForm = () => {
                     placeholder="어떤 신기한 일이 있었나요?"
                 />
                 <div>
-                    <input type="file" multiple hidden ref={imageInput} />
+                    <input type="file" name="image" multiple hidden ref={imageInput} onChange={onChangeImages} />
                     <Button onClick={onClickImageUpload}>이미지 업로드</Button>
-                    <Button type="primary" style={{float : 'right'}} htmlType="submit" loading={false}>짹짹</Button>
+                    <Button type="primary" style={{float : 'right'}} htmlType="submit">짹짹</Button>
                 </div>
                 <div>
-                    {
-                        imagePaths.map((v) => {
-                            <div key={v} className="inline-block">
-                                <img src={v} className="w-48" alt={v} />
-                                <div>
-                                    <Button>제거</Button>
-                                </div>
+                    {imagePaths.map((v , i) => { return (
+                        <div key={v} style={{display: 'inline-block'}}>
+                            <img src={`http://localhost:4070/${v}`} style={{width:'288px'}} alt={v} />
+                            <div>
+                                <Button onClick={onRemoveImage(i)}>제거</Button>
                             </div>
-                        })
-                    }
+                        </div>)
+                    })}
                 </div>
             </Form>
         </>

@@ -7,10 +7,14 @@ import AppLayout from '../components/AppLayout';
 import useInput from '../components/hooks/useInput';
 import { useSelector, useDispatch } from 'react-redux';
 import { signUp } from '../actions/user';
+import wrapper from '../store/configureStore';
+import axios from 'axios';
+import { loadMyInfo } from '../actions/user';
+import { loadPosts } from '../actions/post';
 
 const SignUp = () => {
     const dispatch = useDispatch();
-    const { signUpAction , signUpLoading , signUpDone , signUpError } = useSelector((state) => state.user);
+    const { me , signUpAction , signUpLoading , signUpDone , signUpError } = useSelector((state) => state.user);
 
     const [email, onChangeEmail] = useInput('');
     const [nickname, onChangeNickname] = useInput('');
@@ -43,10 +47,20 @@ const SignUp = () => {
         }))
     },[email, password, passwordCheck, term])
 
+    
+    useEffect(()=>{
+        if(me && me.id){
+            Router.replace('/');
+            //push -> 이전 페이지가 남아있음
+            //replace -> 이전 페이지가 사라짐
+        }
+    },[me && me.id]);
+
     useEffect(() => {
-        if(signUpAction){
-            if(signUpDone){
-                Router.push('/');
+        if(signUpDone){
+            if(!signUpLoading){
+                alert(`회원가입이 정상적으로 처리되었습니다.`);
+                Router.replace('/');
             }
         }
     },[signUpAction, signUpDone]);
@@ -101,5 +115,18 @@ const SignUp = () => {
         </>
     )
 }
+
+export const getServerSideProps = wrapper.getServerSideProps((store) => async ({req}) => {
+    //SSR은 프론트 서버에서 실행되기 때문에, 쿠키를 직접 넣어줘야 한다.
+    const cookie = req ? req.headers.cookie : '';
+    //쿠키를 사용하지 않는다면 쿠키를 비워준다 -> 쿠키가 남아있으면 다른 사용자의 정보를 가져올 수 있다.
+    axios.defaults.headers.Cookie = '';
+    //쿠키가 있다면 쿠키를 넣어준다.
+    if(req && cookie){
+        axios.defaults.headers.Cookie = cookie;
+    }
+    await store.dispatch(loadMyInfo());
+    await store.dispatch(loadPosts());
+})
 
 export default SignUp;

@@ -2,8 +2,21 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { List, Button, Card } from 'antd';
 import { StopOutlined } from '@ant-design/icons';
+import { useSelector, useDispatch } from 'react-redux';
+import { unFollowUser , removeFollower } from '../actions/user';
 
 const FollowList = ({header, data}) => {
+    const dispatch = useDispatch();
+    const { me } = useSelector((state) => state.user);
+    const onCancel = (id) => () => {
+        if(header = '팔로잉 목록'){
+            dispatch(unFollowUser(id));
+        }
+        if(header = '팔로워 목록'){
+            dispatch(removeFollower(id));
+        }
+    }
+
     return(
         <>
             <List
@@ -16,7 +29,7 @@ const FollowList = ({header, data}) => {
                 dataSource = {data}
                 renderItem = {item => (
                     <List.Item style={{ marginTop: 20 }}>
-                        <Card actions = {[<StopOutlined key="stop" />]}>
+                        <Card actions = {[<StopOutlined key="stop" onClick={onCancel(item.id)}/>]}>
                             <Card.Meta description = {
                                 <div>
                                     <div style={{ textAlign : 'center' }}>{item.nickname}</div>

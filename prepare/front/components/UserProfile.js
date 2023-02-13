@@ -7,8 +7,8 @@ import { logOut } from '../actions/user' ;
 const UserProfile = () => {
     const dispatch = useDispatch();
     const { logoutLoading , me } = useSelector((state) => state.user);
-    const email = me?.email;
-    const avatarText = email?.split("@")[0].slice(0,1).toUpperCase();
+    const nickname = me?.nickname;
+    const avatarText = nickname?.split("")[0];
     const onLogOut = useCallback(() => {
         dispatch(logOut());
     },[])
@@ -24,7 +24,7 @@ const UserProfile = () => {
             >
                 <Card.Meta 
                     avatar = {<Avatar>{avatarText}</Avatar>}
-                    title = {email?.split("@")[0]}             
+                    title = {nickname}             
                 />
                 <Button className="mt-4" onClick={onLogOut} loading={logoutLoading}>로그아웃</Button>
             </Card>

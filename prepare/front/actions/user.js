@@ -1,55 +1,109 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from 'axios';
 
-const delay = (data , time) => new Promise((resolve, reject) => {
-    setTimeout(() =>{
-        return resolve(data);
-    }, time)
-});
+axios.defaults.baseURL = 'http://localhost:4070'; //기본 url을 설정해준다.
+axios.defaults.withCredentials = true; // 쿠키를 전달해준다.
 
-export const logIn = createAsyncThunk('user/login' , async (data, thunkAPI) => {
+export const loadMyInfo = createAsyncThunk('user/loadMyInfo' , async () => {
     try{
-        const result = await delay(data, 2000);
-        return result;
-    }catch(error){
-        console.log(error);
-    }
-});
-
-export const logOut = createAsyncThunk('user/logout' , async (data, thunkAPI) => {
-    try{
-        const result = await delay(data = null , 2000);
-        return result;
-    }catch(error){
-        console.log(error);
-    }
-});
-
-export const signUp = createAsyncThunk('user/signup' , async (data, { rejectWithValue }) => {
-    try{
-        const result = await axios.post('http://localhost:4070/user' , data);
-        return result;
+        const response = await axios.get('/user');
+        return response.data;
     }catch(error){
         return rejectWithValue(error.response.data);
     }
 });
 
-export const followUser = createAsyncThunk('user/followUser', async (data , thunkAPI) => {
+export const logIn = createAsyncThunk('user/login' , async (data, {rejectWithValue}) => {
     try{
-        console.log(`팔로우 : ${data}`)
-        const result = await delay(data, 1000);
-        return result;
+        const response = await axios.post('/user/login', data);
+        return response.data;
+    }catch(error){
+        return rejectWithValue(error.response.data);
+    }
+});
+
+export const logOut = createAsyncThunk('user/logout' , async () => {
+    const response = await axios.post('/user/logout');
+    return response.data;
+});
+
+export const signUp = createAsyncThunk('user/signup' , async (data, { rejectWithValue }) => {
+    try{
+        const response = await axios.post('/user' , data);
+        return response.data;
+    }catch(error){
+        return rejectWithValue(error.response.data);
+    }
+});
+
+export const followUser = createAsyncThunk('user/followUser', async (data ,  {rejectWithValue }) => {
+    try{
+        const response = await axios.patch(`/user/${data}/follow`);
+        return response.data;
     }catch(error){
         console.log(error);
+        return rejectWithValue(error.response.data);
     };
 }) 
 
-export const unFollowUser = createAsyncThunk('user/unFollowUser', async (data , thunkAPI) => {
+export const unFollowUser = createAsyncThunk('user/unFollowUser', async (data ,  {rejectWithValue }) => {
     try{
-        const result = await delay(data , 1000);
-        return result;
+        //delete는 body를 못받는다.
+        const response = await axios.delete(`/user/${data}/follow`);
+        return response.data;
     }catch(error){
         console.log(error);
+        return rejectWithValue(error.response.data);
     }
 });
+
+export const removeFollower = createAsyncThunk('user/removeFollower' , async (data, {rejectWithValue}) => {
+    try{
+        const response = await axios.delete(`/user/follow/${data}`);
+        return response.data;
+    }catch(error){
+        console.log(error);
+        return rejectWithValue(error.response.data);
+    }
+})
+
+export const loadFollowerUsers = createAsyncThunk('user/unFollowUser', async (data ,  {rejectWithValue }) => {
+    try{
+        const response = await axios.get(`/user/${data}/follow`);
+        return response.data;
+    }catch(error){
+        console.log(error);
+        return rejectWithValue(error.response.data);
+    }
+});
+
+export const loadFollowingUsers = createAsyncThunk('user/unFollowUser', async (data ,  {rejectWithValue }) => {
+    try{
+        const response = await axios.get(`/user/${data}/follow`);
+        return response.data;
+    }catch(error){
+        console.log(error);
+        return rejectWithValue(error.response.data);
+    }
+});
+
+export const changeNickname = createAsyncThunk('user/nickname' , async(data , {rejectWithValue}) => {
+    try{
+        const response = await axios.patch('/user/nickname', data);
+        return response.data;
+    }catch(error){
+        console.log(error);
+        return rejectWithValue(error.response.data);
+    }
+});
+
+export const loadUser = createAsyncThunk('user/loadUser' , async (data , {rejectWithValue}) => {
+    try{
+        const response = await axios.get(`/user/${data}` , data);
+        return response.data
+    }catch(error){
+        console.log(error);
+        return rejectWithValue(error.response.data)
+    }
+})
     

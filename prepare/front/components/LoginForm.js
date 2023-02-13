@@ -1,13 +1,14 @@
-import React , { useState , useCallback } from 'react';
+import React , { useState , useCallback , useEffect } from 'react';
 import { useSelector , useDispatch } from 'react-redux';
 import { logIn } from '../actions/user';
 import { Form , Input , Button } from 'antd';
 import Link from 'next/link';
+import Router from 'next/router';
 import PropTypes from 'prop-types';
 import useInput from './hooks/useInput';
 
 const LoginForm = ({ setIsLoggedIn }) => {
-    const { me , loginLoading } = useSelector((state) => state.user);
+    const { me , logInLoading , logInError } = useSelector((state) => state.user);
     const dispatch = useDispatch();
 
     const [email, onChangeEmail] = useInput('');
@@ -17,12 +18,15 @@ const LoginForm = ({ setIsLoggedIn }) => {
         console.log(email, password);
         dispatch(logIn({
             email, 
-            password,
-            Posts:[],
-            Followings:[],
-            Followers:[],
+            password
         }));
-    },[email, password])
+    },[email, password]);
+    
+    useEffect(()=>{
+        if(logInError){
+            alert(logInError);
+        }
+    },[logInError])
 
     return(
         <>
@@ -38,7 +42,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
                     <Input name="user-password" type="password" value={password} onChange={onChangePassword} required />
                 </div>
                 <div className="mt-8 text-right space-x-2">
-                    <Button type="primary" htmlType="submit" loading={loginLoading}>로그인</Button>
+                    <Button type="primary" htmlType="submit" loading={logInLoading}>로그인</Button>
                     <Link href="/signup"><button>회원가입</button></Link>
                 </div>
             </Form>
