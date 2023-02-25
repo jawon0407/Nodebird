@@ -298,14 +298,19 @@ router.patch('/:postId/comment/:commentId/like' , isLoggedIn , async (req , res 
     }
 });
 
-router.delete('/:postId/comment/:commentId' , isLoggedIn , async (req , res , next) => { // 댓글 좋아요 취소
+router.delete('/:postId/comment/:commentId/like' , isLoggedIn , async (req , res , next) => { // 댓글 좋아요 취소
     try{
-        const comment = await comment.findOne({where : {id : req.params.commentId}});
+        const exPost = await Post.findOne({
+            where : { id : req.params.postId}
+        });
+        const comment = await Comment.findOne({
+            where : { id : req.params.commentId }
+        });
         if(!comment){
             return res.status(403).send('해당 댓글은 존재하지 않습니다.');
         }
-        await comment.removeLikers(req.user.id);
-        res.json({ CommentId : comment.id , UserId : req.user.id });
+        await comment.removeCommentLikers(req.user.id);
+        res.json({ PostId : exPost.id , CommentId : comment.id , UserId : req.user.id });
     }catch(error){
         console.log(error);
         next(error);

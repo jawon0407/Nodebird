@@ -239,7 +239,6 @@ const postSlice = createSlice({
         state.likeCommentDone = true;
         const post = state.mainPosts.find((v) => v.id === action.payload.PostId);
         const comment = post.Comments.find((v) => v.id === action.payload.CommentId);
-        console.log(comment);
         comment.CommentLikers.push({ id: action.payload.UserId });
       })
       .addCase(likeComment.rejected, (state, action) => {
@@ -256,7 +255,7 @@ const postSlice = createSlice({
         state.unLikeCommentDone = true;
         const post = state.mainPosts.find((v) => v.id === action.payload.PostId);
         const comment = post.Comments.find((v) => v.id === action.payload.CommentId);
-        comment.Likers = comment.Likers.filter((v) => v.id !== action.payload.UserId);
+        comment.CommentLikers = comment.CommentLikers.filter((v) => v.id !== action.payload.UserId);
       })
       .addCase(unLikeComment.rejected, (state, action) => {
         state.unLikeCommentLoading = false;
