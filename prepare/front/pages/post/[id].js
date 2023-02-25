@@ -2,10 +2,10 @@
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
-import wrapper from '../../store/configureStore';
 import Head from 'next/head';
-
 import { useSelector, useDispatch } from 'react-redux';
+import wrapper from '../../store/configureStore';
+
 import { loadMyInfo } from '../../actions/user';
 import { loadPost } from '../../actions/post';
 
@@ -22,7 +22,7 @@ const Post = () => {
         if(id){
             dispatch(loadPost(id));
         }
-    }, [])
+    }, []);
 
     return ( 
         <AppLayout>
@@ -35,21 +35,19 @@ const Post = () => {
                 <meta property="og:image" content={singlePost.Images[0] ? singlePost.Images[0].src : 'https://nodebird.com/favicon.ico'}/>
                 <meta property="og:url" content={`https://nodebird.com/post/${id}`} />
             </Head>
-            <PostCard post={singlePost} />
+            <PostCard post={singlePost} userId={id}/>
         </AppLayout>
-    )
-}
+    );
+};
 
-export const getServerSideProps = wrapper.getServerSideProps((store) => async({ req , params }) => {
+export const getServerSideProps = wrapper.getServerSideProps((store) => async ({req,params}) => {
     const cookie = req ? req.headers.cookie : '';
-    console.log(req);
     axios.defaults.headers.Cookie = '';
     if(req && cookie){
         axios.defaults.headers.Cookie = cookie;
     }
-    console.log('getServerSideProps start');
     await store.dispatch(loadMyInfo());
     await store.dispatch(loadPost(params.id));
-})
+});
 
 export default Post;

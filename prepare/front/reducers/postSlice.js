@@ -8,7 +8,13 @@ import {
   unLikePost , 
   retweetPost ,
   addComment , 
-  uploadImages 
+  uploadImages ,
+  loadUserPosts,
+  loadHashtagPosts,
+  likeComment,
+  unLikeComment,
+  removeComment,
+  retweetComment
 } from '../actions/post';
 
 export const initialState = {
@@ -28,9 +34,6 @@ export const initialState = {
     removePostLoading: false,
     removePostDone: false,
     removePostError: null,
-    addCommentLoading: false,
-    addCommentDone: false,
-    addCommentError: null,
     likePostLoading: false,
     likePostDone: false,
     likePostError: null,
@@ -40,6 +43,21 @@ export const initialState = {
     retweetLoading: false,
     retweetDone: false,
     retweetError: null,
+    addCommentLoading: false,
+    addCommentDone: false,
+    addCommentError: null,
+    likeCommentLoading : false,
+    likeCommentDone : false,
+    likeCommentError : null,
+    unLikeCommentLoading : false,
+    unLikeCommentDone : false,
+    unLikeCommentError : null,
+    removeCommentLoading : false,
+    removeCommentDone : false,
+    removeCommentError : null,
+    retweetCommentLoading : false,
+    retweetCommentDone : false,
+    retweetCommentError : null,
 };
   
 const postSlice = createSlice({
@@ -79,6 +97,36 @@ const postSlice = createSlice({
         state.loadPostsLoading = false;
         state.loadPostsError = action.payload;
       })
+      .addCase(loadHashtagPosts.pending, (state) => {
+        state.loadPostsLoading = true;
+        state.loadPostsDone = false;
+        state.loadPostsError = null;
+      })
+      .addCase(loadHashtagPosts.fulfilled, (state, action) => {
+        state.loadPostsLoading = false;
+        state.loadPostsDone = true;
+        state.mainPosts = action.payload;
+        state.hasMorePosts = action.payload.length === 10;
+      })
+      .addCase(loadHashtagPosts.rejected, (state, action) => {
+        state.loadPostsLoading = false;
+        state.loadPostsError = action.error.message;
+      })
+      .addCase(loadUserPosts.pending, (state) => {
+        state.loadPostsLoading = true;
+        state.loadPostsDone = false;
+        state.loadPostsError = null;
+      })
+      .addCase(loadUserPosts.fulfilled, (state, action) => {
+        state.loadPostsLoading = false;
+        state.loadPostsDone = true;
+        state.mainPosts = action.payload;
+        state.hasMorePosts = action.payload.length === 10;
+      })
+      .addCase(loadUserPosts.rejected, (state, action) => {
+        state.loadPostsLoading = false;
+        state.loadPostsError = action.error.message;
+      })
       .addCase(addPost.pending , (state, action) => {
         state.addPostLoading = true;
         state.addPostDone = false;
@@ -89,7 +137,7 @@ const postSlice = createSlice({
         state.addPostDone = true;
         state.mainPosts.unshift(action.payload);
         state.imagePaths = [];
-        })
+      })
       .addCase(addPost.rejected , (state, action) => {
         state.addPostLoading = false;
         state.addPostError = action.payload;
@@ -178,6 +226,68 @@ const postSlice = createSlice({
         state.mainPosts.unshift(action.payload);
       })
       .addCase(retweetPost.rejected, (state, action) => {
+        state.retweetLoading = false;
+        state.retweetError = action.payload;
+      })
+      .addCase(likeComment.pending, (state, action) => {
+        state.likeCommentLoading = true;
+        state.likeCommentDone = false;
+        state.likeCommentError = null;
+      })
+      .addCase(likeComment.fulfilled, (state, action) => {
+        state.likeCommentLoading = false;
+        state.likeCommentDone = true;
+        const post = state.mainPosts.find((v) => v.id === action.payload.PostId);
+        const comment = post.Comments.find((v) => v.id === action.payload.CommentId);
+        console.log(comment);
+        comment.CommentLikers.push({ id: action.payload.UserId });
+      })
+      .addCase(likeComment.rejected, (state, action) => {
+        state.likeCommentLoading = false;
+        state.likeCommentError = action.payload;
+      })
+      .addCase(unLikeComment.pending, (state, action) => {
+        state.unLikeCommentLoading = true;
+        state.unLikeCommentDone = false;
+        state.unLikeCommentError = null;
+      })
+      .addCase(unLikeComment.fulfilled, (state, action) => {
+        state.unLikeCommentLoading = false;
+        state.unLikeCommentDone = true;
+        const post = state.mainPosts.find((v) => v.id === action.payload.PostId);
+        const comment = post.Comments.find((v) => v.id === action.payload.CommentId);
+        comment.Likers = comment.Likers.filter((v) => v.id !== action.payload.UserId);
+      })
+      .addCase(unLikeComment.rejected, (state, action) => {
+        state.unLikeCommentLoading = false;
+        state.unLikeCommentError = action.payload;
+      })
+      .addCase(removeComment.pending, (state, action) => {
+        state.removeCommentLoading = true;
+        state.removeCommentDone = false;
+        state.removeCommentError = null;
+      })
+      .addCase(removeComment.fulfilled, (state, action) => {
+        state.removeCommentLoading = false;
+        state.removeCommentDone = true;
+        const post = state.mainPosts.find((v) => v.id === action.payload.PostId);
+        post.Comments = post.Comments.filter((v) => v.id !== action.payload.CommentId);
+      })
+      .addCase(removeComment.rejected, (state, action) => {
+        state.removeCommentLoading = false;
+        state.removeCommentError = action.payload;
+      })
+      .addCase(retweetComment.pending, (state, action) => {
+        state.retweetLoading = true;
+        state.retweetDone = false;
+        state.retweetError = null;
+      })
+      .addCase(retweetComment.fulfilled, (state, action) => {
+        state.retweetLoading = false;
+        state.retweetDone = true;
+        state.mainPosts.unshift(action.payload);
+      })
+      .addCase(retweetComment.rejected, (state, action) => {
         state.retweetLoading = false;
         state.retweetError = action.payload;
       })

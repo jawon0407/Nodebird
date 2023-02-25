@@ -18,7 +18,7 @@ const Indicator = styled.div`
         color: white;
         font-size: 15px;
     }
-`
+`;
 
 const Global = createGlobalStyle`
     .slick-slide {
@@ -27,7 +27,7 @@ const Global = createGlobalStyle`
     .ant-card-cover {
         transform: none !important;
     }
-`
+`;
 
 const ImagesZoom = ({ images, onClose }) => {
     const [currentSlice, setCurrentSlice] = useState(0);
@@ -66,12 +66,12 @@ const ImagesZoom = ({ images, onClose }) => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 ImagesZoom.propTypes = {
     images : PropTypes.arrayOf(PropTypes.object).isRequired,
     onClose : PropTypes.func.isRequired,
-}
+};
 
 export default ImagesZoom;

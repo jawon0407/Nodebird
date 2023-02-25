@@ -1,8 +1,8 @@
-import React , { useCallback } from "react"
-import PropTypes from "prop-types"
-import { Button } from "antd"
-import { followUser , unFollowUser } from "../actions/user"
-import {useSelector , useDispatch} from "react-redux"
+import React , { useCallback } from "react";
+import PropTypes from "prop-types";
+import { Button } from "antd";
+import {useSelector , useDispatch} from "react-redux";
+import { followUser , unFollowUser } from "../actions/user";
 
 const FollowButton = ({ post }) => {
     const { me , followLoading , unFollowLoading} = useSelector((state) => state.user);
@@ -11,7 +11,7 @@ const FollowButton = ({ post }) => {
     const onFollow = useCallback(() => {
         if(isFollowing){
             dispatch(unFollowUser(post.User.id)); 
-            //post.User.id = data
+            // post.User.id = data
         } else{
             dispatch(followUser(post.User.id));
         }
@@ -23,21 +23,11 @@ const FollowButton = ({ post }) => {
                 {isFollowing ? '언팔로우' : '팔로우'}
             </Button>
         </>
-    )
-}
+    );
+};
 
 FollowButton.propTypes = {
-    post : PropTypes.shape({
-        User : PropTypes.object,
-        id : PropTypes.number,
-        content : PropTypes.string,
-        createdAt : PropTypes.string,
-        Comments : PropTypes.arrayOf(PropTypes.object),
-        Images : PropTypes.arrayOf(PropTypes.object),
-        Likers : PropTypes.arrayOf(PropTypes.object),
-        RetweetId : PropTypes.number,
-        Retweet : PropTypes.objectOf(PropTypes.any),
-    }).Required
-}
+    post : PropTypes.object.isRequired,
+};
 
-export default FollowButton
+export default FollowButton;

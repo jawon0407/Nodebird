@@ -1,17 +1,17 @@
-import React from "react";
+import React, { useCallback } from "react";
 import PropTypes from "prop-types";
 import Link from "next/link";
 import { Menu , Input , Row , Col } from "antd";
-import { useRouter } from 'next/router';
-import { useSelector } from 'react-redux';
+import Router, { useRouter } from 'next/router';
+import { useSelector , useDispatch } from 'react-redux';
+import styled , {createGlobalStyle} from "styled-components";
 import useInput from './hooks/useInput';
 import UserProfile from './UserProfile';
 import LoginForm from "./LoginForm";
-import styled , {createGlobalStyle} from "styled-components";
 
 const SearchInput = styled(Input.Search)`
     vertical-align : middle;
-`
+`;
 
 const Global = createGlobalStyle`
     .ant-row{
@@ -23,16 +23,25 @@ const Global = createGlobalStyle`
         padding-left : 0 !important;
     }
 
+    .ant-col:nth-child(2){
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+    }
+
     .ant-col:last-child{
         padding-right : 0 !important;
     }
-`
+`;
 
-//const style = useMemo(() => ({ marginTop : 10 }), []);
+// const style = useMemo(() => ({ marginTop : 10 }), []);
 
 export const AppLayout = ({ children }) => {
     const { me } = useSelector((state) => state.user);
     const [ searchInput, onChangeSearchInput ] = useInput('');
+    const onSearch = useCallback(() => {
+        Router.push(`/hashtag/${searchInput}`);
+      }, [searchInput]);
     const router = useRouter();
     return (
         <>
@@ -49,6 +58,7 @@ export const AppLayout = ({ children }) => {
                             enterButton
                             value={searchInput}
                             onChange={onChangeSearchInput}
+                            onSearch={onSearch}
                             className="!align-middle"
                         />,
                             key: '/search' },
@@ -70,11 +80,11 @@ export const AppLayout = ({ children }) => {
                 </div>
             </div>
         </>
-    )
-}
+    );
+};
 
 AppLayout.propTypes = {
     children : PropTypes.node.isRequired,
-}
+};
 
 export default AppLayout;

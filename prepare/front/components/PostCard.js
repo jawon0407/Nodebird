@@ -1,118 +1,156 @@
 import React , {useState , useCallback, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useSelector , useDispatch } from 'react-redux';
+import { Card , Popover , Button , Avatar , List , Comment } from 'antd';
+import { EllipsisOutlined , MessageOutlined , RetweetOutlined , HeartOutlined , HeartTwoTone } from '@ant-design/icons';
 
+import CommentList from './CommentList';
+import PostElaspe from './PostElaspe';
 import PostImages from './PostImages';
 import CommentForm from './CommentForm';
 import FollowButton from './FollowButton';
 import PostCardContent from './PostCardContent';
-import { likePost , unLikePost , removePost , retweetPost } from '../actions/post';
-
-import { useSelector , useDispatch } from 'react-redux';
-import { Card , Popover , Button , Avatar , List , Comment } from 'antd';
-import { EllipsisOutlined, MessageOutlined, RetweetOutlined , HeartOutlined , HeartTwoTone } from '@ant-design/icons';
+import LikeUserModal from './LikeUserModal';
+import LikeUser from './LikeUser';
+import { 
+    likePost , unLikePost , removePost , retweetPost , 
+    likeComment , unLikeComment , removeComment , retweetComment 
+} from '../actions/post';
 
 const userSelector = (state) => state.user;
+const postSelector = (state) => state.post;
 
 const PostCard = ({ post }) => {
     const dispatch = useDispatch();
     const { me } = useSelector(userSelector);
+    const { mainPosts } = useSelector(postSelector);
     const nickname = me?.nickname;
     const id = me?.id;
     const [commentFormOpened , setCommentFormOpened] = useState(false);
+    const [modalOpened , setModalOpened] = useState(false);
     const liked = post.Likers.find((v) => v.id === id);
-    
-    const onLike = useCallback(() => {
-        dispatch(likePost(post.id));
-    },[]);
-    
-    const onUnLike = useCallback(() => {
+
+    const LoginConfirm = useCallback(() => {
         if(!id){
-            return alert('로그인이 필요합니다.');
+            alert('로그인이 필요합니다.');
+            return;
         }
-        dispatch(unLikePost(post.id));
     },[]);
-    
+
     const onToggleComment = useCallback(() => {
         setCommentFormOpened((prev) => !prev);
     },[]);
 
+    // -- Post --
 
+    const onLikePost = useCallback(() => {
+        LoginConfirm();
+        dispatch(likePost(post.id));
+    },[me, mainPosts]);
+    
+    const onUnLikePost = useCallback(() => {
+        LoginConfirm();
+        dispatch(unLikePost(post.id));
+    },[me, mainPosts]);
+    
     const onRemovePost = useCallback(() => {
+        LoginConfirm();
         dispatch(removePost(post.id));
+    },[me, mainPosts]);
+    
+    const onRetweetPost = useCallback(() => {
+        LoginConfirm();
+        dispatch(retweetPost(post.id));
+    },[me, mainPosts]);
+
+    const onRetweetCancel = useCallback(() => {
+        LoginConfirm();
+        const retweetedPost = me.Posts.find((v) => v?.Retweet?.id === post.id);
+        if(retweetedPost){
+            dispatch(removePost(retweetedPost.id));
+        }
+    },[me, mainPosts]);
+
+    // -- LikeUserModal --
+
+    const onOpenLikeUserModal = useCallback(() => {
+        setModalOpened((prev) => !prev);
     },[]);
 
-    const onRetweet = useCallback(() => {
-        if(!id){
-            return alert('로그인이 필요합니다.');
-        }
-        dispatch(retweetPost(post.id));
+    const onCloseLikeUserModal = useCallback(() => {
+        setModalOpened((prev) => !prev);
     },[]);
 
     return(
         <>
-            <div style={{marginBottom : 20}}>
-                    <Card 
-                        cover={post.Images[0] && <PostImages images={post.Images} />}
-                        actions = {[
-                            <RetweetOutlined key="retweet" onClick={onRetweet}/>,
-                            liked 
-                            ? <HeartTwoTone twoToneColor='#eb2f96' key='heart' onClick={onUnLike}/> 
-                            : <HeartOutlined key="heart" onClick={onLike}/>,
-                            <MessageOutlined key="comment" onClick={onToggleComment}/>,
-                            <Popover key="more" content={(
-                                <Button.Group>
-                                    { nickname && post.User.nickname === nickname ? (
-                                        <>
-                                            <Button>수정</Button>
-                                            <Button type="danger" onClick={onRemovePost}>삭제</Button>
-                                        </>
-                                    ) : <Button>신고</Button> }
-                                </Button.Group>
-                            )}>
-                                <EllipsisOutlined />
-                            </Popover>
-                        ]}
-                        title={post.RetweetId ? `${post.User.nickname}님이 리트윗하셨습니다.` : null}
-                        extra={ nickname === post.User.nickname ? null : <FollowButton post={post} /> }
-                        >
-                        {
-                        post.RetweetId && post.Retweet
-                            ? (
+            <div className="my-5 w-full">
+                <Card 
+                    cover={post.Images[0] && <PostImages images={post.Images} />}
+                    actions = {[
+                        me?.Posts.find((v) => v?.Retweet?.id === post.id)
+                        ? <RetweetOutlined key="retweet" onClick={onRetweetCancel} className="!text-blue-500" />
+                        : <RetweetOutlined key="retweet" onClick={onRetweetPost} />,
+                        liked 
+                        ? <HeartTwoTone twoToneColor='#eb2f96' key='heart' onClick={onUnLikePost}/> 
+                        : <HeartOutlined key="heart" onClick={onLikePost}/>,
+                        <MessageOutlined key="comment" onClick={onToggleComment}/>,
+                        <Popover key="more" content={(
+                            <Button.Group>
+                                { nickname && post.User.nickname === nickname ? (
+                                    <>
+                                        <Button>수정</Button>
+                                        <Button type="danger" onClick={onRemovePost}>삭제</Button>
+                                    </>
+                                ) : <Button>신고</Button> }
+                            </Button.Group>
+                        )}>
+                            <EllipsisOutlined />
+                        </Popover>
+                    ]}
+                    title={post.RetweetId ? `${post.User.nickname}님이 리트윗하셨습니다.` : null}
+                    extra={ nickname === post.User.nickname ? null : <FollowButton post={post} /> }
+                    >
+                    {
+                    post.RetweetId && post.Retweet
+                        ? (
+                                <Link href={`/post/${post.id}`}>
                                     <Card cover={post.Retweet.Images[0] && <PostImages images={post.Retweet.Images} />}>
-                                        <Card.Meta 
-                                            avatar = {<Avatar>{post.Retweet.User.nickname[0]}</Avatar>}
-                                            title = {post.Retweet.User.nickname}
-                                            description = {<PostCardContent postData={post.Retweet.content}/>}
-                                        />
+                                            <Card.Meta 
+                                                avatar = {
+                                                    <Link href={`/user/${post.Retweet.User.id}`}>
+                                                        <Avatar>{post.Retweet.User.nickname[0]}</Avatar>
+                                                    </Link>
+                                                }
+                                                title = {post.Retweet.User.nickname}
+                                                description = {<PostCardContent postData={post.Retweet.content}/>}
+                                            />
                                     </Card>
-                            )
-                            :  (
+                                </Link>
+                        )
+                        : (
+                            <Link href={`/post/${post.id}`}>
                                 <Card.Meta 
                                     avatar = {
-                                            <Avatar>{post.User.nickname[0]}</Avatar>
+                                            <Link href={`/user/${post.User.id}`}>
+                                                <Avatar>
+                                                    {post.User.nickname[0]}
+                                                </Avatar>
+                                            </Link>
                                     }
                                     title = {post.User.nickname}
                                     description = {<PostCardContent postData={post.content} />}
-                                />   
-                            )
-                        }
-                        {
-                            post.Likers.length > 0 && 
-                                <div className="my-4 flex align-center">
-                                    <HeartTwoTone twoToneColor='#eb2f96' key='heart' className="mt-[4px]"/> 
-                                    <span className="ml-1 text-gray-500">
-                                        {post.Likers.length}개
-                                    </span>
-                                </div>
-                        }
-                        {
-                            post.createdAt && 
-                                <div className="text-gray-300 mt-4">
-                                    {`${post.createdAt.split('-')[0]}년 ${post.createdAt.split('-')[1]}월 ${post.createdAt.split('-')[2].split('T')[0]}일 ${post.createdAt.split('-')[2].split('T')[1].split('.')[0]}`}
-                                </div>
-                        }
-                    </Card>
+                                />
+                            </Link>   
+                        )
+                    }
+                    {
+                        <LikeUser onOpenModal={onOpenLikeUserModal} post={post} />
+                    }{
+                        <PostElaspe post={post}/>
+                    }
+                </Card>
                 {commentFormOpened && (
                     <div>
                         <CommentForm post={post} />
@@ -121,22 +159,22 @@ const PostCard = ({ post }) => {
                             itemLayout = "horizontal"
                             dataSource = {post.Comments}
                             renderItem = {(item) => (
-                                //item 은 dataSource의 각각의 요소 item = post.Comments[]
+                                // item 은 dataSource의 각각의 요소 item = post.Comments[]
                                 <li>
-                                    <Comment
-                                        author = {item.User.nickname}
-                                        avatar = {<Avatar>{item.User.nickname[0]}</Avatar>}
-                                        content = {item.content}
-                                    />
+                                    <CommentList item={item} post={post} LoginConfirm={LoginConfirm} />
                                 </li>
                             )}
                         />
                     </div>
                 )}
             </div>
+            {modalOpened && (
+                    <LikeUserModal onCloseModal={onCloseLikeUserModal} post={post}/>
+                )
+            }
         </>
-    )
-}
+    );
+};
 
 PostCard.propTypes = {
     post: PropTypes.shape({

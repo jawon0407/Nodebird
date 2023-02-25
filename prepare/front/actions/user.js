@@ -13,6 +13,17 @@ export const loadMyInfo = createAsyncThunk('user/loadMyInfo' , async () => {
     }
 });
 
+export const loadUser = createAsyncThunk('user/loadUser' , async (data, {rejectWithValue}) => {
+    try{
+        console.log(data);
+        const response = await axios.get(`/user/${data.userId}`);
+        return response.data;
+    }catch(error){
+        return rejectWithValue(error.response.data);
+    }
+});
+
+
 export const logIn = createAsyncThunk('user/login' , async (data, {rejectWithValue}) => {
     try{
         const response = await axios.post('/user/login', data);
@@ -96,14 +107,3 @@ export const changeNickname = createAsyncThunk('user/nickname' , async(data , {r
         return rejectWithValue(error.response.data);
     }
 });
-
-export const loadUser = createAsyncThunk('user/loadUser' , async (data , {rejectWithValue}) => {
-    try{
-        const response = await axios.get(`/user/${data}` , data);
-        return response.data
-    }catch(error){
-        console.log(error);
-        return rejectWithValue(error.response.data)
-    }
-})
-    

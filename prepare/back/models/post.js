@@ -1,7 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
     const Post = sequelize.define('Post', {
         //mySQL에서는 posts 테이블 생성
-        //id가 기본적으로 들어있다.
         content: {
             type : DataTypes.TEXT,
             allowNull : false,
@@ -18,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
         db.Post.belongsTo(db.User); // Post : User = N : 1 다 대 1 관계
         db.Post.belongsTo(db.Post, { as: 'Retweet' });
         db.Post.belongsToMany(db.Hashtag, { through: 'PostHashtag' }); // Post : Hashtag = N : M 다 대 다 관계
-        db.Post.belongsToMany(db.User, { through: 'Like', as: 'Likers' }); // post.addLikers , post.removeLikers
+        db.Post.belongsToMany(db.User, { through: 'Like', as: 'Likers' });
         db.Post.hasMany(db.Comment);   // Post : Comment = 1 : N 1 대 다수 관계
         db.Post.hasMany(db.Image); // Post : Image = 1 : N 1 대 다수 관계
     };

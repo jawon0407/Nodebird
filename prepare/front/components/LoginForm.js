@@ -1,11 +1,11 @@
 import React , { useState , useCallback , useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { useSelector , useDispatch } from 'react-redux';
-import { logIn } from '../actions/user';
 import { Form , Input , Button } from 'antd';
 import Link from 'next/link';
 import Router from 'next/router';
-import PropTypes from 'prop-types';
 import useInput from './hooks/useInput';
+import { logIn } from '../actions/user';
 
 const LoginForm = ({ setIsLoggedIn }) => {
     const { me , logInLoading , logInError } = useSelector((state) => state.user);
@@ -22,11 +22,11 @@ const LoginForm = ({ setIsLoggedIn }) => {
         }));
     },[email, password]);
     
-    useEffect(()=>{
+    useEffect(() => {
         if(logInError){
             alert(logInError);
         }
-    },[logInError])
+    },[logInError]);
 
     return(
         <>
@@ -47,8 +47,8 @@ const LoginForm = ({ setIsLoggedIn }) => {
                 </div>
             </Form>
         </>
-    )
-}
+    );
+};
 
 // LoginForm.propTypes = {
 //     onSubmitForm : PropTypes.func.isRequired,

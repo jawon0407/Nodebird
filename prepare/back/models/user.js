@@ -25,6 +25,7 @@ module.exports = (sequelize, DataTypes) => {
     User.associate = (db) => {
         db.User.hasMany(db.Post); // User : Post = 1 : N 1 대 다수 관계
         db.User.hasMany(db.Comment); // User : Comment = 1 : N 1 대 다수 관계
+        db.User.belongsToMany(db.Comment, { through : 'CommentLiker' , as : 'CommentLiked' }); // User : Comment = N : M 다 대 다 관계 (through = 중간 테이블 이름 , as = 별칭
         db.User.belongsToMany(db.Post , { through : 'Like' , as : "Liked" }); // User : Post = N : M 다 대 다 관계 (through = 중간 테이블 이름 , as = 별칭)
         db.User.belongsToMany(db.User, { through : 'Follow' , as : 'Followers' , foreignKey : 'FollowingId'}); // through = 중간 테이블 이름 , foreignKey = 반대쪽 테이블의 컬럼명
         db.User.belongsToMany(db.User, { through : 'Follow' , as : 'Followings' , foreignKey : 'FollowerId'});

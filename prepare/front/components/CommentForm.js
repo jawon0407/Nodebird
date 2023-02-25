@@ -1,8 +1,8 @@
 import React , { useCallback , useEffect } from "react";
 import PropTypes from "prop-types";
 import { Form, Input, Button } from "antd";
-import useInput from "./hooks/useInput";
 import { useSelector , useDispatch } from "react-redux";
+import useInput from "./hooks/useInput";
 import { addComment } from "../actions/post";
 
 const CommentForm = ({ post }) => {
@@ -13,7 +13,7 @@ const CommentForm = ({ post }) => {
     
     const onSubmitComment = useCallback(() => {
         dispatch(addComment({content : commentText, postId : post.id, userId : id}));
-    },[commentText])
+    },[commentText]);
 
     useEffect(() => {
         if(addCommentDone){
@@ -31,11 +31,11 @@ const CommentForm = ({ post }) => {
                 </Form.Item>
             </Form>
         </>
-    )
-}
+    );
+};
 
 CommentForm.propTypes = {
     post: PropTypes.object.isRequired,
-}
+};
 
 export default CommentForm;

@@ -167,20 +167,20 @@ const userSlice = createSlice({
             state.changeNicknameLoading = false;
             state.changeNicknameError = action.error;
         })
-        .addCase(loadUser.pending , (state, action) => {
+        .addCase(loadUser.pending, (state) => {
             state.loadUserLoading = true;
             state.loadUserDone = false;
             state.loadUserError = null;
-        })
-        .addCase(loadUser.fulfilled , (state, action) => {
+          })
+          .addCase(loadUser.fulfilled, (state, action) => {
             state.loadUserLoading = false;
             state.loadUserDone = true;
             state.userInfo = action.payload;
-        })
-        .addCase(loadUser.rejected , (state, action) => {
+          })
+          .addCase(loadUser.rejected, (state, action) => {
             state.loadUserLoading = false;
             state.loadUserError = action.payload;
-        })
+          })
 });
 
 export default userSlice;

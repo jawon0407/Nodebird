@@ -18,7 +18,7 @@ const PostImages = ({ images }) => {
                 {/* role = presention : (시각장애인 편의성) 이미지라고 스크린 리더기에 인식되지 않게 해줌 */}
                 { showImagesZoom && <ImagesZoom images={images} onClose={onClose} /> }
             </>
-        )
+        );
     }
     if(images.length === 2) {
         return(
@@ -27,7 +27,7 @@ const PostImages = ({ images }) => {
                 <img role="presentation" style={{ width: '50%' , display: 'inline-block' }} src={`http://localhost:4070/${images[1].src}`} alt={images[1].src} onClick={onZoom} />
                 { showImagesZoom && <ImagesZoom images={images} onClose={onClose} /> }
             </>
-        )
+        );
     }
     return(
         <>
@@ -45,11 +45,11 @@ const PostImages = ({ images }) => {
             </div>
             { showImagesZoom && <ImagesZoom images={images} onClose={onClose} /> }
         </>
-    )
-}
+    );
+};
 
 PostImages.propTypes = {
     images: PropTypes.arrayOf(PropTypes.object).isRequired,
-}
+};
 
 export default PostImages;

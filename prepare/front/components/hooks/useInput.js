@@ -7,4 +7,4 @@ export default (initialValue = null) => {
         console.log(setValue);
     }, [value]);
     return [ value, handler , setValue ];
-}
+};

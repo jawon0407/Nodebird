@@ -1,20 +1,22 @@
-import {useEffect} from 'react';
+import React , {useEffect} from 'react';
+import { useSelector , useDispatch } from 'react-redux';
+import axios from 'axios';
 import AppLayout from "../components/AppLayout";
 import PostForm from "../components/PostForm";
 import PostCard from "../components/PostCard";
 import { loadMyInfo } from "../actions/user";
 import { loadPosts } from "../actions/post";
-
-import { useSelector , useDispatch } from 'react-redux';
 import wrapper from '../store/configureStore';
-import axios from 'axios';
 
 const userSelector = (state) => state.user;
 const postSelector = (state) => state.post;
 
 const Home = () => {
     const { me } = useSelector(userSelector);
-    const { removePostLoading , removePostDone , mainPosts , hasMorePosts , loadPostsLoading , retweetError , likePostError} = useSelector(postSelector);
+    const { 
+        removePostLoading , removePostDone , mainPosts , hasMorePosts , 
+        loadPostsLoading , retweetDone , retweetError , likePostError
+    } = useSelector(postSelector);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -27,22 +29,28 @@ const Home = () => {
         if(retweetError){
             alert(retweetError);
         }
-    },[retweetError])
+    },[retweetError]);
 
     useEffect(() => {
-        if(removePostDone){
-            if(!removePostLoading){
-                dispatch(loadMyInfo());
-                dispatch(loadPosts());
-            }
+        if(removePostDone && !removePostLoading){
+            dispatch(loadMyInfo());
+            dispatch(loadPosts());
         }
-    },[removePostDone])
+    },[removePostLoading, removePostDone]);
+
+    useEffect(() => {
+        if(retweetDone){
+            dispatch(loadMyInfo());
+            dispatch(loadPosts());
+        }
+    },[retweetDone]);
 
 
     useEffect(() => {
         function onScroll(){
             const lastId = mainPosts[mainPosts.length - 1]?.id;
             if(window.scrollY + document.documentElement.clientHeight > document.documentElement.scrollHeight - 300){
+                console.log(window.scrollY + document.documentElement.clientHeight);
                 if(hasMorePosts && !loadPostsLoading){
                     dispatch(loadPosts(lastId));
                 }
@@ -51,30 +59,29 @@ const Home = () => {
         window.addEventListener('scroll', onScroll);
         return () => {
             window.removeEventListener('scroll', onScroll);
-        }
-    }, [hasMorePosts , loadPostsLoading])
+        };
+    }, [hasMorePosts , loadPostsLoading]);
 
     return(
         <AppLayout>
-            {/* AppLayout으로 감싼 부분 = children -> components에 children*/}
             {me && <PostForm />}
             {mainPosts.map((post, i) => <PostCard key={post.id} post={post}/>)}
         </AppLayout>
-    )
-}
+    );
+};
 
 export const getServerSideProps = wrapper.getServerSideProps((store) => async ({req}) => {
-    //SSR은 프론트 서버에서 실행되기 때문에, 쿠키를 직접 넣어줘야 한다.
+    // SSR은 프론트 서버에서 실행되기 때문에, 쿠키를 직접 넣어줘야 한다.
     const cookie = req ? req.headers.cookie : '';
-    //쿠키를 사용하지 않는다면 쿠키를 비워준다 -> 쿠키가 남아있으면 다른 사용자의 정보를 가져올 수 있다.
+    // 쿠키를 사용하지 않는다면 쿠키를 비워준다 -> 쿠키가 남아있으면 다른 사용자의 정보를 가져올 수 있다.
     axios.defaults.headers.Cookie = '';
-    //쿠키가 있다면 쿠키를 넣어준다.
+    // 쿠키가 있다면 쿠키를 넣어준다.
     if(req && cookie){
         axios.defaults.headers.Cookie = cookie;
     }
     await store.dispatch(loadMyInfo());
     await store.dispatch(loadPosts());
-})
+});
 
 /* 
     getServerSideProps vs getStaticProps
