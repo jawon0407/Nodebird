@@ -317,15 +317,21 @@ router.delete('/:postId/comment/:commentId/like' , isLoggedIn , async (req , res
     }
 });
 
-router.delete('/comment/:commentId' , isLoggedIn , async(req, res, next) => { // 댓글 삭제
+router.delete('/:postId/comment/:commentId' , isLoggedIn , async(req, res, next) => { // 댓글 삭제
     try{
+        const exPost = await Post.findOne({
+            where : { id : req.params.postId }
+        })
+        if(!exPost){
+            return res.status(403).send('존재하지 않는 게시글입니다.');
+        }
         await Comment.destroy({
             where : { 
                 id : req.params.commentId, 
                 UserId : req.user.id 
             },
         })
-        res.status(200).json({CommentId : parseInt(req.params.commentId , 10)});
+        res.status(200).json({CommentId : parseInt(req.params.commentId , 10) , PostId : exPost.id});
     }catch(error){
         console.log(error);
         next(error);
