@@ -2,7 +2,7 @@ import {createAsyncThunk} from "@reduxjs/toolkit";
 import userSlice from "../reducers/userSlice";
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:4070';
+axios.defaults.baseURL = 'http://localhost:7777';
 axios.defaults.withCredentials = true;
 
 export const loadPost = createAsyncThunk('post/loadPost' , async(data, {rejectWithValue}) => {
@@ -52,9 +52,8 @@ export const addPost = createAsyncThunk('post/addPost', async (data, thunkAPI) =
     } catch (error) {
       return rejectWithValue(error.response.data);
     }
-  });
-
-  
+});
+ 
 export const removePost = createAsyncThunk('post/removePost' , async (data, thunkAPI) => { 
     try{
         const response = await axios.delete(`/post/${data}`)
@@ -118,6 +117,16 @@ export const unLikePost = createAsyncThunk('post/unLikePost' , async (data, {rej
     }
 });
 
+export const editPost = createAsyncThunk('post/editPost', async (data , {rejectWithValue}) => {
+    try{
+        const response = await axios.patch(`/post/${data.postId}/edit`, data);
+        return response.data;
+    }catch(error){
+        console.log(error);
+        return rejectWithValue(error.response.data);
+    }
+})
+
 export const likeComment = createAsyncThunk('post/likeComment' , async (data, {rejectWithValue}) => {
     try{
         const response = await axios.patch(`/post/${data.postId}/comment/${data.commentId}/like`);
@@ -131,16 +140,6 @@ export const likeComment = createAsyncThunk('post/likeComment' , async (data, {r
 export const unLikeComment = createAsyncThunk('post/unLikeComment' , async (data, {rejectWithValue}) => {
     try{
         const response = await axios.delete(`/post/${data.postId}/comment/${data.commentId}/like`);
-        return response.data;
-    }catch(error){
-        console.log(error);
-        return rejectWithValue(error.response.data);
-    }
-});
-
-export const retweetComment = createAsyncThunk('post/retweetComment' , async (data, {rejectWithValue}) => {
-    try{
-        const response = await axios.post(`/post/${data.postId}/comment/${data.commentId}/retweet`);
         return response.data;
     }catch(error){
         console.log(error);

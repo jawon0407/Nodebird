@@ -50,7 +50,7 @@ const ImagesZoom = ({ images, onClose }) => {
                     >
                         {images.map((v) => (
                             <div className="p-8 text-center" key={v.src}>
-                                <img src={`http://localhost:4070/${v.src}`} alt={v.src} className="my-0 mx-auto max-h-[750px]"/>
+                                <img src={`http://localhost:7777/${v.src}`} alt={v.src} className="my-0 mx-auto max-h-[750px]"/>
                             </div>
                         ))}
                     </Slick>

@@ -34,6 +34,7 @@ const PostForm = () => {
     }, [addPostDone]);
 
     const imageInput = useRef();
+
     const onClickImageUpload = useCallback(() => {
         imageInput.current.click();
     },[imageInput.current]);
@@ -72,7 +73,7 @@ const PostForm = () => {
                 <div>
                     {imagePaths.map((v , i) => { return (
                             <div key={v} style={{display: 'inline-block'}}>
-                                <img src={`http://localhost:4070/${v}`} style={{width:'288px'}} alt={v} />
+                                <img src={`http://localhost:7777/${v}`} style={{width:'288px'}} alt={v} />
                                 <div>
                                     <Button onClick={onRemoveImage(i)}>제거</Button>
                                 </div>

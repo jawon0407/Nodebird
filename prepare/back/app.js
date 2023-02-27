@@ -17,6 +17,7 @@ const db = require('./models');
 const passportConfig = require('./passport');
 
 dotenv.config();
+
 const app = express();
 db.sequelize.sync()
   .then(() => {
@@ -66,6 +67,6 @@ app.use('/post', postRouter);
 app.use('/user', userRouter);
 app.use('/hashtag', hashtagRouter);
 
-app.listen(4070, () => {
+app.listen(7777, () => {
   console.log('서버 실행 중!');
 });

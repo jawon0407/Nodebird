@@ -34,8 +34,12 @@ const UserProfile = () => {
                     </div>
                 ]}
             >
-                <Card.Meta 
-                    avatar = {<Avatar>{avatarText}</Avatar>}
+                <Card.Meta
+                    avatar = {
+                        <Link href={`/user/${me.id}`} prefetch={false}>
+                            <Avatar>{avatarText}</Avatar>
+                        </Link>
+                    }
                     title = {nickname}             
                 />
                 <Button className="mt-4" onClick={onLogOut} loading={logoutLoading}>로그아웃</Button>

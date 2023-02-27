@@ -7,6 +7,7 @@ import {
   likePost , 
   unLikePost , 
   retweetPost ,
+  editPost ,
   addComment , 
   uploadImages ,
   loadUserPosts,
@@ -14,7 +15,6 @@ import {
   likeComment,
   unLikeComment,
   removeComment,
-  retweetComment
 } from '../actions/post';
 
 export const initialState = {
@@ -37,6 +37,9 @@ export const initialState = {
     likePostLoading: false,
     likePostDone: false,
     likePostError: null,
+    editPostLoading: false,
+    editPostDone: false,
+    editPostError: null,
     uploadImagesLoading: false,
     uploadImagesDone: false,
     uploadImagesError: null,
@@ -229,6 +232,20 @@ const postSlice = createSlice({
         state.retweetLoading = false;
         state.retweetError = action.payload;
       })
+      .addCase(editPost.pending , (state, action) => {
+        state.editPostLoading = true;
+        state.editPostDone = false;
+        state.editPostError = null;
+      })
+      .addCase(editPost.fulfilled, (state, action) => {
+        state.editPostLoading = false;
+        state.editPostDone = true;
+        state.mainPosts.find((v) => v.id === action.payload.PostId).content = action.payload.content;
+      })
+      .addCase(editPost.rejected, (state, action) => {
+        state.editPostLoading = false;
+        state.editPostError = action.payload;
+      })
       .addCase(likeComment.pending, (state, action) => {
         state.likeCommentLoading = true;
         state.likeCommentDone = false;
@@ -275,20 +292,6 @@ const postSlice = createSlice({
       .addCase(removeComment.rejected, (state, action) => {
         state.removeCommentLoading = false;
         state.removeCommentError = action.payload;
-      })
-      .addCase(retweetComment.pending, (state, action) => {
-        state.retweetLoading = true;
-        state.retweetDone = false;
-        state.retweetError = null;
-      })
-      .addCase(retweetComment.fulfilled, (state, action) => {
-        state.retweetLoading = false;
-        state.retweetDone = true;
-        state.mainPosts.unshift(action.payload);
-      })
-      .addCase(retweetComment.rejected, (state, action) => {
-        state.retweetLoading = false;
-        state.retweetError = action.payload;
       })
 });
 

@@ -15,8 +15,7 @@ import PostCardContent from './PostCardContent';
 import LikeUserModal from './LikeUserModal';
 import LikeUser from './LikeUser';
 import { 
-    likePost , unLikePost , removePost , retweetPost , 
-    likeComment , unLikeComment , removeComment , retweetComment 
+    likePost , unLikePost , removePost , retweetPost , editPost 
 } from '../actions/post';
 
 const userSelector = (state) => state.user;
@@ -30,6 +29,7 @@ const PostCard = ({ post }) => {
     const id = me?.id;
     const [commentFormOpened , setCommentFormOpened] = useState(false);
     const [modalOpened , setModalOpened] = useState(false);
+    const [editMode, setEditMode] = useState(false);
     const liked = post.Likers.find((v) => v.id === id);
 
     const LoginConfirm = useCallback(() => {
@@ -73,8 +73,6 @@ const PostCard = ({ post }) => {
         }
     },[me, mainPosts]);
 
-    // -- LikeUserModal --
-
     const onOpenLikeUserModal = useCallback(() => {
         setModalOpened((prev) => !prev);
     },[]);
@@ -83,6 +81,18 @@ const PostCard = ({ post }) => {
         setModalOpened((prev) => !prev);
     },[]);
 
+    const onEditPost = useCallback(() => {
+        setEditMode(true);
+    },[]);
+
+    const onChangePost = useCallback((editText) => () => {
+        dispatch(editPost({postId: post.id, content: editText}))
+    }, [post])
+
+    const onCancelEdit = useCallback(() => {
+        setEditMode(false);
+    },[]);
+    
     return(
         <>
             <div className="my-5 w-full">
@@ -100,7 +110,7 @@ const PostCard = ({ post }) => {
                             <Button.Group>
                                 { nickname && post.User.nickname === nickname ? (
                                     <>
-                                        <Button>수정</Button>
+                                        {!post.RetweetId && <Button onClick={onEditPost}>수정</Button>}
                                         <Button type="danger" onClick={onRemovePost}>삭제</Button>
                                     </>
                                 ) : <Button>신고</Button> }
@@ -115,34 +125,30 @@ const PostCard = ({ post }) => {
                     {
                     post.RetweetId && post.Retweet
                         ? (
-                                <Link href={`/post/${post.id}`}>
-                                    <Card cover={post.Retweet.Images[0] && <PostImages images={post.Retweet.Images} />}>
-                                            <Card.Meta 
-                                                avatar = {
-                                                    <Link href={`/user/${post.Retweet.User.id}`}>
-                                                        <Avatar>{post.Retweet.User.nickname[0]}</Avatar>
-                                                    </Link>
-                                                }
-                                                title = {post.Retweet.User.nickname}
-                                                description = {<PostCardContent postData={post.Retweet.content}/>}
-                                            />
-                                    </Card>
-                                </Link>
+                            <Card cover={post.Retweet.Images[0] && <PostImages images={post.Retweet.Images} />}>
+                                    <Card.Meta 
+                                        avatar = {
+                                            <Link href={`/user/${post.Retweet.User.id}`}>
+                                                <Avatar>{post.Retweet.User.nickname[0]}</Avatar>
+                                            </Link>
+                                        }
+                                        title = {post.Retweet.User.nickname}
+                                        description = {<PostCardContent post={post} onCancelEdit={onCancelEdit} onChangePost={onChangePost} postData={post.Retweet.content}/>}
+                                    />
+                            </Card>
                         )
                         : (
-                            <Link href={`/post/${post.id}`}>
-                                <Card.Meta 
-                                    avatar = {
-                                            <Link href={`/user/${post.User.id}`}>
-                                                <Avatar>
-                                                    {post.User.nickname[0]}
-                                                </Avatar>
-                                            </Link>
-                                    }
-                                    title = {post.User.nickname}
-                                    description = {<PostCardContent postData={post.content} />}
-                                />
-                            </Link>   
+                            <Card.Meta 
+                                avatar = {
+                                        <Link href={`/user/${post.User.id}`}>
+                                            <Avatar>
+                                                {post.User.nickname[0]}
+                                            </Avatar>
+                                        </Link>
+                                }
+                                title = {post.User.nickname}
+                                description = {<PostCardContent editMode={editMode} postData={post.content} post={post} onCancelEdit={onCancelEdit} onChangePost={onChangePost} />}
+                            />
                         )
                     }
                     {
@@ -188,6 +194,6 @@ PostCard.propTypes = {
       RetweetId: PropTypes.any,
       Retweet: PropTypes.objectOf(PropTypes.any),
     }).isRequired,
-  };
+};
 
 export default PostCard;

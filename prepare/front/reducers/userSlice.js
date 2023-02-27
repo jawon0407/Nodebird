@@ -54,7 +54,14 @@ const userSlice = createSlice({
         removePostToMe(state, action){
             state.me.Posts = state.me.Posts.filter((v) => v.id !== action.payload.PostId);
             console.log(state.me.Posts);
-        }
+        },
+        addCommentToMe(state, action){
+            state.me.Comments.unshift({id : action.payload});
+        },
+        removeCommentToMe(state, action){
+            state.me.Comments = state.me.Comments.filter((v) => v.id !== action.payload.CommentId);
+        },
+
     },
     extraReducers : (builder) => builder
         .addCase(loadMyInfo.pending , (state, action) => {
@@ -167,20 +174,20 @@ const userSlice = createSlice({
             state.changeNicknameLoading = false;
             state.changeNicknameError = action.error;
         })
-        .addCase(loadUser.pending, (state) => {
+        .addCase(loadUser.pending, (state , action) => {
             state.loadUserLoading = true;
             state.loadUserDone = false;
             state.loadUserError = null;
-          })
-          .addCase(loadUser.fulfilled, (state, action) => {
-            state.loadUserLoading = false;
-            state.loadUserDone = true;
-            state.userInfo = action.payload;
-          })
-          .addCase(loadUser.rejected, (state, action) => {
-            state.loadUserLoading = false;
-            state.loadUserError = action.payload;
-          })
+        })
+        .addCase(loadUser.fulfilled, (state, action) => {
+        state.loadUserLoading = false;
+        state.loadUserDone = true;
+        state.userInfo = action.payload;
+        })
+        .addCase(loadUser.rejected, (state, action) => {
+        state.loadUserLoading = false;
+        state.loadUserError = action.payload;
+        })
 });
 
 export default userSlice;

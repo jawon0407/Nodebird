@@ -2,8 +2,8 @@ import React, {useCallback} from 'react';
 import Link from 'next/link';
 import { useSelector , useDispatch} from 'react-redux';
 import { Popover , Avatar , Comment , Button  } from 'antd';
-import { RetweetOutlined , HeartOutlined , HeartTwoTone , EllipsisOutlined } from '@ant-design/icons';
-import { likeComment , unLikeComment , removeComment , retweetComment } from '../actions/post';
+import { HeartOutlined , HeartTwoTone , EllipsisOutlined } from '@ant-design/icons';
+import { likeComment , unLikeComment , removeComment } from '../actions/post';
 
 const userSelector = (state) => state.user;
 const postSelector = (state) => state.post;
@@ -15,8 +15,6 @@ const CommentList = ({ item , post , LoginConfirm }) => {
     const id = me?.id;
     const comment = post.Comments.find((v) => v.id === item.id);
     const liked = comment.CommentLikers.find((v) => v.id === id);
-
-    console.log(comment);
 
     const onLikeComment = useCallback(() => {
         LoginConfirm();
@@ -33,11 +31,6 @@ const CommentList = ({ item , post , LoginConfirm }) => {
         LoginConfirm();
         dispatch(removeComment({commentId : item.id , postId : post.id}));
     },[me, mainPosts]);
-    
-    const onRetweetComment = useCallback(() => {
-        LoginConfirm();
-        dispatch(retweetComment({commentId : item.id , postId : post.id}));
-    },[me, mainPosts]);
 
     return(
         <>
@@ -50,7 +43,6 @@ const CommentList = ({ item , post , LoginConfirm }) => {
                 }
                 content = {item.content}
                 actions = {[
-                    <RetweetOutlined key="retweet" onClick={onRetweetComment}/>,
                     liked 
                     ? <HeartTwoTone twoToneColor='#eb2f96' key='heart' onClick={onUnLikeComment}/> 
                     : <HeartOutlined key="heart" onClick={onLikeComment}/>,

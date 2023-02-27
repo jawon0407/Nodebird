@@ -279,6 +279,38 @@ router.post('/:postId/retweet' , isLoggedIn , async (req, res) => { // 게시글
     }
 });
 
+router.patch('/:postId/edit' , isLoggedIn , async (req, res, next) => { // 게시글 수정'
+    const hashtags = req.body.content.match(/#[^\s#]+/g);
+    try{
+        console.log(req);
+        const exPost = await Post.findOne({
+            where : { id : req.params.postId}
+        });
+        if(!exPost){
+            return res.status(403).send('존재하지 않는 게시글입니다.');
+        }
+        await Post.update({
+            content : req.body.content,
+        },{
+            where : { 
+                id : req.params.postId,
+                UserId : req.user.id
+            }
+        })
+        if(hashtags){
+            const result = await Promise.all(hashtags.map((tag) => Hashtag.findOrCreate({ 
+                // findOrCreate : 이미 존재하면 가져오고 없으면 생성
+                where : {name : tag.slice(1).toLowerCase()}, 
+            })));// result 형태 : [[노드, true], [리액트, true]] 이중배열
+            await exPost.addHashtags(result.map((v) => v[0]));
+        }
+        res.status(200).json({ PostId : parseInt(req.params.postId , 10) , content : req.body.content });
+    }catch(error){
+        console.log(error);
+        return next(error);
+    } 
+})
+
 router.patch('/:postId/comment/:commentId/like' , isLoggedIn , async (req , res , next) => {// 댓글 좋아요
     try{
         const exPost = await Post.findOne({
@@ -337,86 +369,6 @@ router.delete('/:postId/comment/:commentId' , isLoggedIn , async(req, res, next)
         next(error);
     }
 });
-
-// router.post('/comment/:commentId/retweet' , isLoggedIn , async (req, res) => { // 댓글 리트윗
-//     try{
-//         // 게시글이 존재하는지 확인
-//         const post = await Post.findOne({
-//             where : { id : req.params.commentId },
-//             include:[{
-//                 model : Post,
-//                 as: 'Retweet',
-//             }]
-//         })
-
-//         const comment = await Comment.findOne({
-//             where : { id : req.params.commentId },
-//         })
-//         if(!comment){
-//             return res.status(403).send('존재하지 않는 댓글입니다.');
-//         }
-
-//         if(post.Retweet && post.Retweet.UserId === req.user.id){
-//             // 내가 리트윗한 게시글을 다시 리트윗할 때
-//             return res.status(403).send('자신의 글은 리트윗 할 수 없습니다.');
-//         }
-        
-//         const retweetTargetId = post.comments.id || post.id;
-//         const exPost = await Post.findOne({
-//             where : {
-//                 UserId : req.user.id,
-//                 RetweetId : retweetTargetId,
-//             }
-//         });
-//         if(exPost){
-//             return res.status(403).send('이미 리트윗 했습니다.');
-//         }
-//         const retweet = await Post.create({
-//             UserId : req.user.id,
-//             RetweetId : retweetTargetId, // 원본 댓글의 아이디
-//             content : 'Comment retweet',
-//         })
-//         const retweetWithPrevComment = await Post.findOne({
-//             where : { id : retweet.id },
-//             include : [{
-//                 model : Post,
-//                 as : 'Retweet',
-//                 include : [{
-//                     model : User,
-//                     attributes : ['id', 'nickname'],
-//                 },{
-//                     model : Image,
-//                 },{
-//                     model : User,
-//                     through : 'Like',
-//                     as : 'Likers',
-//                     attributes : ['id' , 'nickname'],
-//                 }]
-//             },{
-//                 model : User,
-//                 attributes : ['id', 'nickname'],
-//             },{
-//                 model : User,
-//                 through : 'Like',
-//                 as : 'Likers',
-//                 attributes : ['id'],
-//             },{
-//                 model : Comment,
-//                 include : [{
-//                     model : User,
-//                     attributes : ['id', 'nickname'],
-//                 }]
-//             },{
-//                 model : Image,
-//             }]
-//         })
-//         res.status(201).json(retweetWithPrevComment);
-//     }catch(error){
-//         console.log(error);
-//         next(error);
-//     }
-// });
-
 
 router.delete('/' , (req, res) => {
     res.json([

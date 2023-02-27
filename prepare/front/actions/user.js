@@ -1,7 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from 'axios';
 
-axios.defaults.baseURL = 'http://localhost:4070'; //기본 url을 설정해준다.
+axios.defaults.baseURL = 'http://localhost:7777'; //기본 url을 설정해준다.
 axios.defaults.withCredentials = true; // 쿠키를 전달해준다.
 
 export const loadMyInfo = createAsyncThunk('user/loadMyInfo' , async () => {

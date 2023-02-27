@@ -14,7 +14,7 @@ const PostImages = ({ images }) => {
     if(images.length === 1) {
         return (
             <>
-                <img role="presentation" style={{maxWidth : '200px'}} src={`http://localhost:4070/${images[0].src}`} alt={images[0].src} onClick={onZoom} />
+                <img role="presentation" style={{maxWidth : '200px'}} src={`http://localhost:7777/${images[0].src}`} alt={images[0].src} onClick={onZoom} />
                 {/* role = presention : (시각장애인 편의성) 이미지라고 스크린 리더기에 인식되지 않게 해줌 */}
                 { showImagesZoom && <ImagesZoom images={images} onClose={onClose} /> }
             </>
@@ -23,8 +23,8 @@ const PostImages = ({ images }) => {
     if(images.length === 2) {
         return(
             <>
-                <img role="presentation" style={{ width: '50%' , display: 'inline-block' }} src={`http://localhost:4070/${images[0].src}`} alt={images[0].src} onClick={onZoom} />
-                <img role="presentation" style={{ width: '50%' , display: 'inline-block' }} src={`http://localhost:4070/${images[1].src}`} alt={images[1].src} onClick={onZoom} />
+                <img role="presentation" style={{ width: '50%' , display: 'inline-block' }} src={`http://localhost:7777/${images[0].src}`} alt={images[0].src} onClick={onZoom} />
+                <img role="presentation" style={{ width: '50%' , display: 'inline-block' }} src={`http://localhost:7777/${images[1].src}`} alt={images[1].src} onClick={onZoom} />
                 { showImagesZoom && <ImagesZoom images={images} onClose={onClose} /> }
             </>
         );
@@ -32,7 +32,7 @@ const PostImages = ({ images }) => {
     return(
         <>
             <div>
-                <img role="presentation" style={{ width: '50%' , display: 'inline-block'}} src={`http://localhost:4070/${images[0].src}`} alt={images[0].src} onClick={onZoom} />
+                <img role="presentation" style={{ width: '50%' , display: 'inline-block'}} src={`http://localhost:7777/${images[0].src}`} alt={images[0].src} onClick={onZoom} />
                 <div
                     role="presentation"
                     style={{ display: 'inline-block', width: '50%', textAlign: 'center', verticalAlign: 'middle' }}
