@@ -1,4 +1,5 @@
 import React , {useEffect} from 'react';
+import Router from 'next/router';
 import { useSelector , useDispatch } from 'react-redux';
 import axios from 'axios';
 import AppLayout from "../components/AppLayout";
@@ -15,21 +16,30 @@ const Home = () => {
     const { me } = useSelector(userSelector);
     const { 
         removePostLoading , removePostDone , mainPosts , hasMorePosts , 
-        loadPostsLoading , retweetDone , retweetError , likePostError
+        loadPostsLoading , retweetDone , retweetError , likePostError ,
+        editPostDone , editPostError , editCommentDone , editCommentError
     } = useSelector(postSelector);
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if(editPostDone || editCommentDone){
+            alert(`정상적으로 수정되었습니다.`);
+            Router.replace('/');
+        }
+        if(editPostError || editCommentError){
+            alert(`수정에 실패했습니다`);
+        }
+    },[editPostDone , editPostError]);   
+    
 
     useEffect(() => {
         if(likePostError){
             alert(likePostError);
         }
-    }, [likePostError]);
-
-    useEffect(() => {
         if(retweetError){
             alert(retweetError);
         }
-    },[retweetError]);
+    }, [likePostError, retweetError]);
 
     useEffect(() => {
         if(removePostDone && !removePostLoading){
@@ -37,14 +47,6 @@ const Home = () => {
             dispatch(loadPosts());
         }
     },[removePostLoading, removePostDone]);
-
-    useEffect(() => {
-        if(retweetDone){
-            dispatch(loadMyInfo());
-            dispatch(loadPosts());
-        }
-    },[retweetDone]);
-
 
     useEffect(() => {
         function onScroll(){

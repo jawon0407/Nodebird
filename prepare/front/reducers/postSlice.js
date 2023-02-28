@@ -15,6 +15,7 @@ import {
   likeComment,
   unLikeComment,
   removeComment,
+  editComment
 } from '../actions/post';
 
 export const initialState = {
@@ -61,8 +62,11 @@ export const initialState = {
     retweetCommentLoading : false,
     retweetCommentDone : false,
     retweetCommentError : null,
-};
-  
+    editCommentLoading : false,
+    editCommentDone : false,
+    editCommentError : null
+}
+
 const postSlice = createSlice({
     name: 'post',
     initialState,
@@ -292,6 +296,21 @@ const postSlice = createSlice({
       .addCase(removeComment.rejected, (state, action) => {
         state.removeCommentLoading = false;
         state.removeCommentError = action.payload;
+      })
+      .addCase(editComment.pending , (state, action) => {
+        state.editCommentLoading = true;
+        state.editCommentDone = false;
+        state.editCommentError = null;
+      })
+      .addCase(editComment.fulfilled, (state, action) => {
+        state.editCommentLoading = false;
+        state.editCommentDone = true;
+        const post = state.mainPosts.find((v) => v.id === action.payload.PostId);
+        post.Comments.find((v) => v.id === action.payload.CommentId).content = action.payload.content;
+      })
+      .addCase(editComment.rejected, (state, action) => {
+        state.editCommentLoading = false;
+        state.editCommentError = action.payload;
       })
 });
 

@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { useSelector } from 'react-redux'; 
 import { Input , Button } from 'antd';
 import PropTypes from 'prop-types';
-import { Router } from 'next/router';
 
 // 첫 번째 게시글 #해시태그 #익스프레스#안녕
 // regexr.com
@@ -23,28 +22,24 @@ import { Router } from 'next/router';
 const { TextArea } = Input;
 const PostCardContent = ({ postData , editMode , onCancelEdit , onChangePost }) => {
     const [editText, setEditText] = useState(postData);
-    const { editPostLoading , editPostDone , editPostError } = useSelector((state) => state.post);
-    const onChangeText = useCallback((e) => {
-        setEditText(e.target.value);
-    },[editText]);
-
+    const { editPostLoading , editPostDone } = useSelector((state) => state.post);
+    
     useEffect(() => {
         if(editPostDone){
-            alert('게시글이 수정되었습니다.');
-            return onCancelEdit();
-        }
-        if(editPostError){
-            alert('게시글 수정에 실패했습니다.');
-            return Router.push('/');
+            onCancelEdit();
         }
     },[editPostDone])
+
+    const onChangePostText = useCallback((e) => {
+        setEditText(e.target.value);
+    });
 
     return(
         <>
             {editMode 
                 ? (
                     <>
-                        <TextArea value={postData} onChange={onChangeText}/>
+                        <TextArea value={editText} onChange={onChangePostText}/>
                         <Button.Group>
                             <Button type="primary" loading={editPostLoading} onClick={onChangePost(editText)}>수정</Button>
                             <Button type="danger" onClick={onCancelEdit}>취소</Button>

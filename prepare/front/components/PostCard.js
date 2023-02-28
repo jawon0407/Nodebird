@@ -7,7 +7,7 @@ import { Card , Popover , Button , Avatar , List , Comment } from 'antd';
 import { EllipsisOutlined , MessageOutlined , RetweetOutlined , HeartOutlined , HeartTwoTone } from '@ant-design/icons';
 
 import CommentList from './CommentList';
-import PostElaspe from './PostElaspe';
+import Elaspe from './Elaspe';
 import PostImages from './PostImages';
 import CommentForm from './CommentForm';
 import FollowButton from './FollowButton';
@@ -154,7 +154,7 @@ const PostCard = ({ post }) => {
                     {
                         <LikeUser onOpenModal={onOpenLikeUserModal} post={post} />
                     }{
-                        <PostElaspe post={post}/>
+                        <Elaspe post={post}/>
                     }
                 </Card>
                 {commentFormOpened && (

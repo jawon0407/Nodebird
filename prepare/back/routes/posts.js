@@ -14,7 +14,7 @@ router.get('/', async (req, res) => {// GET /posts
             where,
             limit : 10,
             // offset : 0, // 0번부터 10개(limit 개수만큼) 가져옴 -> 로딩중 게시글을 추가하거나 삭제하면 offset방식은 꼬이기 때문에 잘 안쓰임
-            order : [['createdAt' , 'DESC'], [Comment, 'createdAt', 'DESC']],
+            order : [['updatedAt' , 'DESC'], [Comment, 'createdAt', 'DESC']],
             include : [{
                 model : User,
                 attributes : ['id', 'nickname']

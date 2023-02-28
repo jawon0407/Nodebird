@@ -370,6 +370,34 @@ router.delete('/:postId/comment/:commentId' , isLoggedIn , async(req, res, next)
     }
 });
 
+router.patch('/:postId/comment/:commentId/edit' , isLoggedIn , async (req, res, next) => { // 게시글 수정'
+    try{
+        console.log(req);
+        const exPost = await Post.findOne({
+            where : { id : req.params.postId}
+        });
+        const exComment = await Comment.findOne({
+            where: { id : req.params.commentId}
+        })
+        if(!exPost || !exComment){
+            return res.status(403).send('존재하지 않는 게시글입니다.');
+        }
+        await Comment.update({
+            content : req.body.content,
+        },{
+            where : { 
+                id : req.params.commentId,
+                UserId : req.user.id
+            }
+        })
+        res.status(200).json({ PostId : parseInt(req.params.postId , 10) , CommentId : parseInt(req.params.commentId) , content : req.body.content });
+    }catch(error){
+        console.log(error);
+        return next(error);
+    } 
+})
+
+
 router.delete('/' , (req, res) => {
     res.json([
         {id: 1},

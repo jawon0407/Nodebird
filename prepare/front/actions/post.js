@@ -158,3 +158,13 @@ export const removeComment = createAsyncThunk('post/removeComment' , async (data
         return rejectWithValue(error.response.data);
     }
 });
+
+export const editComment = createAsyncThunk('post/editComment', async (data , {rejectWithValue}) => {
+    try{
+        const response = await axios.patch(`/post/${data.postId}/comment/${data.commentId}/edit`, data);
+        return response.data;
+    }catch(error){
+        console.log(error);
+        return rejectWithValue(error.response.data);
+    }
+})
