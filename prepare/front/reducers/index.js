@@ -4,6 +4,14 @@ import { HYDRATE } from 'next-redux-wrapper';
 import userSlice from './userSlice';
 import postSlice from './postSlice';
 
+const A = {
+  talk : () => {
+    console.log("A talk");
+  }
+}
+
+A.talk()
+
 // (이전상태, 액션) => 다음상태
 const rootReducer = (state, action) => {
   switch (action.type) {

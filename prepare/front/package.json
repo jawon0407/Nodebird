@@ -26,6 +26,8 @@
     "pm2": "^5.2.2",
     "prop-types": "^15.8.1",
     "react": "^18.2.0",
+    "react-dnd": "^16.0.1",
+    "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5",
     "react-slick": "^0.29.0",
@@ -33,7 +35,7 @@
     "redux-logger": "^3.0.6",
     "shortid": "^2.2.16",
     "styled-components": "^5.3.6",
-    "swr": "^2.0.3"
+    "swr": "^2.1.1"
   },
   "devDependencies": {
     "@types/node": "18.11.18",

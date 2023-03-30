@@ -80,7 +80,7 @@ export const removeFollower = createAsyncThunk('user/removeFollower' , async (da
 
 export const loadFollowerUsers = createAsyncThunk('user/unFollowUser', async (data ,  {rejectWithValue }) => {
     try{
-        const response = await axios.get(`/user/${data}/follow`);
+        const response = await axios.get(`/user/followings`);
         return response.data;
     }catch(error){
         console.log(error);
@@ -90,7 +90,7 @@ export const loadFollowerUsers = createAsyncThunk('user/unFollowUser', async (da
 
 export const loadFollowingUsers = createAsyncThunk('user/unFollowUser', async (data ,  {rejectWithValue }) => {
     try{
-        const response = await axios.get(`/user/${data}/follow`);
+        const response = await axios.get(`/user/followers`);
         return response.data;
     }catch(error){
         console.log(error);

@@ -1,40 +1,61 @@
 import React, { useEffect , useCallback , useState } from 'react';
 import Head from 'next/head';
 import Router from 'next/router';
-import { useSelector } from 'react-redux';
+import { useSelector , useDispatch } from 'react-redux';
 import axios from 'axios';
+import useSWR from 'swr';
 import AppLayout from '../components/AppLayout';
 import NicknameEditForm from '../components/NicknameEditForm';
 import FollowList from '../components/FollowList';
 import wrapper from '../store/configureStore';
-import { loadMyInfo } from '../actions/user';
 import { loadPosts } from '../actions/post';
+import { loadMyInfo } from '../actions/user';
 
+const fetcher = (url) => axios.get(url , { withCrendentials : true }).then((result) => result.data);
 const userSelector = (state) => state.user;
 
 const Profile = () => {
     const { me } = useSelector(userSelector);
+    const [followingsLimit , setFollowingsLimit] = useState(3);
+    const [followersLimit , setFollowersLimit] = useState(3);
 
+    //data , error 가 없으면 로딩중이다
+    const { data : followingsData , error : followingError } = useSWR(`http://localhost:7777/user/followings?limit=${followingsLimit}`, fetcher);
+    const { data : followersData , error : followerError } = useSWR(`http://localhost:7777/user/followers?limit=${followersLimit}`, fetcher);
+    
     useEffect(() => {
         if(!(me && me.id)){
             alert('로그인이 필요합니다.');
             Router.push('/');
         }
     },[me && me.id]);
+    
+    const loadMoreFollowings = useCallback(() => {
+        setFollowingsLimit((prev) => prev + 3);
+    },[]);
+
+    const loadMoreFollowers = useCallback(() => {
+        setFollowersLimit((prev) => prev + 3);
+    },[]);
 
     if(!me){
-        return null;
+        return '내 정보 로딩 중...';
+    }
+    
+    if(followerError || followingError){
+        console.error(followerError || followingError);
+        return '팔로잉/팔로워 로딩 중 에러가 발생했습니다.';
     }
 
     return(
         <>
+            <Head>
+                <title>내 프로필 | NodeBird</title>
+            </Head>  
             <AppLayout>
-                <Head>
-                    <title>내 프로필 | NodeBird</title>
-                </Head>  
                 <NicknameEditForm className="w-full"/>
-                <FollowList header="팔로잉 목록" data={me?.Followings} className="w-full"/>
-                <FollowList header="팔로워 목록" data={me?.Followers} className="w-full"/>
+                <FollowList header="팔로잉 목록" data={followingsData} onClickMore={loadMoreFollowings} loading={!followingsData && !followingError} className="w-full"/>
+                <FollowList header="팔로워 목록" data={followersData} onClickMore={loadMoreFollowers} loading={!followersData && !followerError} className="w-full"/>
             </AppLayout>
         </>
     );
